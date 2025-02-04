@@ -61,49 +61,6 @@ def bt_embeddings_from_local(text, image):
     }
     
 
-def bt_scores_with_image_and_text_retrieval():
-    url = "http://images.cocodataset.org/val2017/000000039769.jpg"
-    image = Image.open(requests.get(url, stream=True).raw)
-    texts = ["An image of two cats chilling on a couch", "A football player scoring a goal"]
-
-    processor = BridgeTowerProcessor.from_pretrained("BridgeTower/bridgetower-large-itm-mlm-gaudi")
-    model = BridgeTowerForImageAndTextRetrieval.from_pretrained("BridgeTower/bridgetower-large-itm-mlm-gaudi")
-
-# forward pass
-    scores = dict()
-    for text in texts:
-        # prepare inputs
-        encoding = processor(image, text, return_tensors="pt") 
-        outputs = model(**encoding)
-        scores[text] = outputs.logits[0,1].item()
-    return scores
-
-
-def bt_with_masked_input():
-    url = "http://images.cocodataset.org/val2017/000000360943.jpg"
-    image = Image.open(requests.get(url, stream=True).raw).convert("RGB")
-    text = "a <mask> looking out of the window"
-
-
-    processor = BridgeTowerProcessor.from_pretrained("BridgeTower/bridgetower-large-itm-mlm-gaudi")
-    model = BridgeTowerForMaskedLM.from_pretrained("BridgeTower/bridgetower-large-itm-mlm-gaudi")
-
-    # prepare inputs
-    encoding = processor(image, text, return_tensors="pt")
-
-    # forward pass
-    outputs = model(**encoding)
-
-    token_ids = outputs.logits.argmax(dim=-1).squeeze(0).tolist()
-    if isinstance(token_ids, list):
-        results = processor.tokenizer.decode(token_ids)
-    else:
-        results = processor.tokenizer.decode([token_ids])
-
-    print(results)
-    return results
-#res = bt_embeddingsl()
-#print((res['text_embeddings']))
 for img in [img1, img2, img3]:
     embeddings = bt_embeddings_from_local(img['caption'], Image.open(img['image_path']))
     print(embeddings['cross_modal_embeddings'][0].shape)

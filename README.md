@@ -99,9 +99,9 @@ _ = MultimodalLanceDB.from_text_image_pairs(
     mode="overwrite", 
 )
 ```
-# Gotchas
-
-
-- Why Didn’t Hot Reloading Work?  
-- Downloading did not work since cat image from flicker was not available
-- PredictionGuard was a huge dud. No KEY is available unless you contact them. For some reason hugging face also did not work. I ended up using transformer and downloading 3.5G of model 
+# Gotchas and Solutions
+    Image Processing: When working with base64 encoded images, convert them to PIL.Image format before processing with BridgeTower
+    Model Selection: Using BridgeTowerForContrastiveLearning instead of PredictionGuard due to API access limitations
+    Model Size: BridgeTower model requires ~3.5GB download
+    Image Downloads: Some Flickr images may be unavailable; implement robust error handling
+    Token Decoding: BridgeTower contrastive learning model works with embeddings, not token predictions
