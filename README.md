@@ -77,3 +77,29 @@ Developed in collaboration with Intel, this model maps image-caption pairs into 
     - Encodes each frame as a **Base64 image**.  
     - Extracts context and captions from video frames.  
     - Uses **Case 1** processing.  
+
+# Step 4 - What is LLaVA?
+LLaVA (Large Language-and-Vision Assistant), a large multimodal model that connects a vision encoder that doesn't just see images but understands them, reads the text embedded in them, and reasons about their context—all.
+
+# Step 5 - what is a vector Store?
+A vector store is a specialized database designed to:
+
+- Store and manage high-dimensional vector data efficiently
+- Perform similarity-based searches where K=1 returns the most similar result
+
+- In LanceDB specifically, store multiple data types:
+    . Text content (captions)
+    . Image file paths
+    . Metadata
+    . Vector embeddings
+
+```python
+_ = MultimodalLanceDB.from_text_image_pairs(
+    texts=updated_vid1_trans+vid2_trans,
+    image_paths=vid1_img_path+vid2_img_path,
+    embedding=BridgeTowerEmbeddings(),
+    metadatas=vid1_metadata+vid2_metadata,
+    connection=db,
+    table_name=TBL_NAME,
+    mode="overwrite", 
+)```
