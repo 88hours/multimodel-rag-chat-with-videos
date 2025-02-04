@@ -1,53 +1,79 @@
-# Journey into learning - 4:00 pm
-https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture
-- A MULTIMODEL AI SYSTEM SHOULD BE ABLE TO UNDERSTAND TEXT, VIDEO CONTENT
+# Journey into Learning - 4:00 PM  
 
-## Step 1 - learn Gradio (UI): 30 mins
-Great for making quick UI in python, that will run in browser. It also has hot reloading.
+[**Interactive Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
 
-fn: The function to wrap a user interface (UI) around
-inputs: the Gradio component(s) to use for the input. The number of components should match the number of arguments in your function.
-outputs: the Gradio component(s) to use for the output. The number of components should match the number of return values from your function.
+### A multimodal AI system should be able to understand both text and video content.  
 
-https://www.gradio.app/docs/gradio/introduction
+---
 
-Gradio includes more than 30 built-in components 
+## Step 1 - Learn Gradio (UI) (30 mins)  
 
-Tip:
- For the `inputs` and `outputs` arguments, you can pass in the name of these components as a string (`"textbox"`) or an instance of the class (`gr.Textbox()`).
+Gradio is a powerful Python library for quickly building browser-based UIs. It supports hot reloading for fast development.  
 
-## Sharing Demo
- demo.launch(share=True)  # Share your demo with just 1 extra parameter.
- ### Why did not hot reloading worked?
+### Key Concepts:  
+- **fn**: The function wrapped by the UI.  
+- **inputs**: The Gradio components used for input (should match function arguments).  
+- **outputs**: The Gradio components used for output (should match return values).  
 
+📖 [**Gradio Documentation**](https://www.gradio.app/docs/gradio/introduction)  
 
+Gradio includes **30+ built-in components**.  
 
-## Gradio.Blocks
-Gradio offers a low-level approach for designing web apps with more customizable layouts and data flows with the gr.Blocks class. Blocks supports things like controlling where components appear on the page, handling multiple data flows and more complex interactions (e.g. outputs can serve as inputs to other functions), and updating properties/visibility of components based on user interaction — still all in Python.
+💡 **Tip**: For `inputs` and `outputs`, you can pass either:  
+- The **component name** as a string (e.g., `"textbox"`)  
+- An **instance of the component class** (e.g., `gr.Textbox()`)  
 
-## Gradio.ChatInterface
- Always set type="messages" in gr.ChatInterface. The default value (type="tuples") is deprecated and will be removed in a future version of Gradio.
- Better to use gr.ChatBot for more ui options
- gr.ChatInterface also supports markdown (I did not try it thou)
-## Step 2 Learn Bridge Tower Embedding Model (MultiModel Learning Space): 15 mins
- Made by Collab at Intel
- 512- Dimenstions, so mean each image,caption pair has been coverted into a 512 dimension vector
-### Measuing distance
- Cosine Similarity to see how much images are far and near to each other - Cheap Computing, Commanly used
- Euclidean Distance using CV vision call by passing two images with cv2.NORM_L2
- ### Conversion to 2D for display purposes
- UMAP to transfer 512 vector dimension embeddings to 2 dimension embeddings 
+### Sharing Your Demo  
+```python
+demo.launch(share=True)  # Share your demo with just one extra parameter.
+```
 
-## Preprocessing Videos for Multimodal RAG¶
-### Case 1: WEBVVT =>  Text Segment from video 
-    - Convert video and text into metadata, by dividing into multiple segment 
+### Why Didn’t Hot Reloading Work?  
+(Investigate potential caching issues, missing dependencies, or incorrect function signatures.)  
 
-### Case 2: Whisper(small) => Video Only
-    - Extract Audio -> model.transcribe
-    - Apply getSubs() helper function to get WEBVVT
-    - Apply Case 1
+---
 
-### Case 3: Lvlm => Video + silent/music (extract from video )
-    - Lava 
-    - Encode each frame as a base64 image 
-    - Pass it to Lava (LvLM model) to get captions and get the context
+## Gradio Advanced Features  
+
+### **Gradio.Blocks**  
+Gradio provides `gr.Blocks`, a flexible way to design web apps with **custom layouts and complex interactions**:  
+- Arrange components freely on the page.  
+- Handle multiple data flows.  
+- Use outputs as inputs for other components.  
+- Dynamically update components based on user interaction.  
+
+### **Gradio.ChatInterface**  
+- Always set `type="messages"` in `gr.ChatInterface`.  
+- The default (`type="tuples"`) is **deprecated** and will be removed in future versions.  
+- For more UI flexibility, use `gr.ChatBot`.  
+- `gr.ChatInterface` supports **Markdown** (not tested yet).  
+
+---
+
+## Step 2 - Learn Bridge Tower Embedding Model (Multimodal Learning) (15 mins)  
+
+Developed in collaboration with Intel, this model maps image-caption pairs into **512-dimensional vectors**.  
+
+### Measuring Similarity  
+- **Cosine Similarity** → Measures how close images are in vector space (**efficient & commonly used**).  
+- **Euclidean Distance** → Uses `cv2.NORM_L2` to compute similarity between two images.  
+
+### Converting to 2D for Visualization  
+- **UMAP** reduces 512D embeddings to **2D for display purposes**.  
+
+## Preprocessing Videos for Multimodal RAG  
+
+### **Case 1: WEBVTT → Extracting Text Segments from Video**  
+    - Converts video + text into structured metadata.  
+    - Splits content into multiple segments.  
+
+### **Case 2: Whisper (Small) → Video Only**  
+    - Extracts **audio** → `model.transcribe()`.  
+    - Applies `getSubs()` helper function to retrieve **WEBVTT** subtitles.  
+    - Uses **Case 1** processing.  
+
+### **Case 3: LvLM → Video + Silent/Music Extraction**  
+    - Uses **Llava (LvLM model)** for **frame-based captioning**.  
+    - Encodes each frame as a **Base64 image**.  
+    - Extracts context and captions from video frames.  
+    - Uses **Case 1** processing.  
