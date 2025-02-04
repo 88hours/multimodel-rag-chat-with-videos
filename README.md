@@ -27,3 +27,5 @@ Gradio offers a low-level approach for designing web apps with more customizable
 
 ### learn - Gradio.ChatInterface
  Always set type="messages" in gr.ChatInterface. The default value (type="tuples") is deprecated and will be removed in a future version of Gradio.
+ Better to use gr.ChatBot for more ui options
+ gr.ChatInterface also supports markdown (I did not try it thou)
