@@ -28,11 +28,6 @@ Gradio includes **30+ built-in components**.
 demo.launch(share=True)  # Share your demo with just one extra parameter.
 ```
 
-### Why Didn’t Hot Reloading Work?  
-(Investigate potential caching issues, missing dependencies, or incorrect function signatures.)  
-
----
-
 ## Gradio Advanced Features  
 
 ### **Gradio.Blocks**  
@@ -102,4 +97,11 @@ _ = MultimodalLanceDB.from_text_image_pairs(
     connection=db,
     table_name=TBL_NAME,
     mode="overwrite", 
-)```
+)
+```
+# Gotchas
+
+
+- Why Didn’t Hot Reloading Work?  
+- Downloading did not work since cat image from flicker was not available
+- PredictionGuard was a huge dud. No KEY is available unless you contact them. For some reason hugging face also did not work. I ended up using transformer and downloading 3.5G of model 
