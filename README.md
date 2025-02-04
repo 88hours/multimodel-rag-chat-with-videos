@@ -1,4 +1,4 @@
-# Journey into Learning - 4:00 PM  
+# Journey into Learning/Disecting - 4:00 PM  
 
 [**Interactive Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
 
