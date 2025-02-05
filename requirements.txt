@@ -13,3 +13,5 @@ moviepy
 whisper
 webvtt-py
 tqdm
+lancedb
+mmrag

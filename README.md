@@ -115,4 +115,5 @@ _ = MultimodalLanceDB.from_text_image_pairs(
 
 #Future
     Stream model from Hugging Face, instead of download
-        - Example: (https://medium.com/@arthur.lagacherie/two-easy-ways-to-stream-output-from-any-huggingface-model-4c70d6a0cf88)
+        - [Example:](https://medium.com/@arthur.lagacherie/two-easy-ways-to-stream-output-from-any-huggingface-model-4c70d6a0cf88)
+        - [Simplify:]https://blog.lancedb.com/multimodal-rag-applications/
