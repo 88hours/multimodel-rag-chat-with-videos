@@ -1,4 +1,5 @@
-# Implement Multimodal RAG System Pipeline Journey
+# ReArchitecture Multimodal RAG System Pipeline Journey
+Now it is simplified, refactored, bug-fixed, removed prediction guard, isolated each concept into a step as Python runnable
 
 [**Interactive Video Chat Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
 
