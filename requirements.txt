@@ -6,3 +6,5 @@ pytubefix
 youtube_transcript_api
 torch
 transformers
+matplotlib
+seaborn
