@@ -1,4 +1,4 @@
-# Journey into Learning/Disecting
+# Implement Multimodal RAG System Pipeline Journey
 
 [**Interactive Video Chat Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
 
