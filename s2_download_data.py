@@ -1,9 +1,6 @@
 import requests
 from PIL import Image
 from IPython.display import display
-import huggingface_hub
-from huggingface_hub import list_datasets
-from huggingface_hub import HfApi
 
 # You can use your own uploaded images and captions. 
 # You will be responsible for the legal use of images that 
@@ -49,19 +46,4 @@ def download_images():
         caption = img['caption']
         display(image)
         print(caption)
-        
-def load_data_from_huggingface(hf_dataset_name):
-        
-    api = HfApi()
-
-    #list models from huggingface
-
-    #models = list(api.list_models())
-
-    #list datasets from huggingface
-
-    #datasets = list(api.list_datasets())
-
-
-    return api.list_datasets(search=hf_dataset_name)
-   
+    

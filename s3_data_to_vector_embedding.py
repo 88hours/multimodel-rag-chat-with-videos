@@ -58,5 +58,4 @@ def save_embeddings():
         print(embedding['cross_modal_embeddings'][0].shape) #<class 'torch.Tensor'>
         torch.save(embedding['cross_modal_embeddings'][0], img['tensor_path'] + '.pt')
     
-save_embeddings()
 
