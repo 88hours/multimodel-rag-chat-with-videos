@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 import torch
+from IPython.display import display
 
 url1='http://farm3.staticflickr.com/2519/4126738647_cc436c111b_z.jpg'
 cap1='A motorcycle sits parked across from a herd of livestock'
@@ -36,11 +37,10 @@ def load_tensor(path):
     return torch.load(path)
 
 def load_embeddings():
-    img1_tensor = load_tensor(img1['tensor_path'])
-    img2_tensor = load_tensor(img2['tensor_path'])
-    img3_tensor = load_tensor(img3['tensor_path'])
-    return np.array(img1_tensor), np.array(img2_tensor), np.array(img3_tensor)
-
+    img1_tensor = load_tensor(img1['tensor_path'] + '.pt')
+    img2_tensor = load_tensor(img2['tensor_path'] + '.pt')
+    img3_tensor = load_tensor(img3['tensor_path'] + '.pt')
+    return img1_tensor.data.numpy(), img2_tensor.data.numpy(), img3_tensor.data.numpy()
 
 def cosine_similarity(vec1, vec2):
     similarity = np.dot(vec1,vec2)/(norm(vec1)*norm(vec2))
@@ -51,6 +51,12 @@ def calculate_distance():
     similarity1 = cosine_similarity(img1_tensor, img2_tensor)
     similarity2 = cosine_similarity(img1_tensor, img3_tensor)
     similarity3 = cosine_similarity(img2_tensor, img3_tensor)
-    return similarity1, similarity2, similarity3
+    return [similarity1, similarity2, similarity3]
 
-print(calculate_distance())
+distances = calculate_distance()
+print("Cosine similarity between ex1_embeded and ex2_embeded is:")
+display(distances[0])
+print("Cosine similarity between ex1_embeded and ex3_embeded is:")
+display(distances[1])
+print("Cosine similarity between ex2_embeded and ex2_embeded is:")
+display(distances[2])

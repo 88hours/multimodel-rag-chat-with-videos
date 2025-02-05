@@ -1,4 +1,3 @@
-import numpy as np
 from numpy.linalg import norm
 from transformers import BridgeTowerProcessor, BridgeTowerForContrastiveLearning
 import torch
