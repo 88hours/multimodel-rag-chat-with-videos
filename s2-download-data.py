@@ -1,5 +1,6 @@
 import requests
 from PIL import Image
+from IPython.display import display
 # You can use your own uploaded images and captions. 
 # You will be responsible for the legal use of images that 
 #  you are going to use.
@@ -42,6 +43,8 @@ def download_images():
     for img in [img1, img2, img3]:
         image = Image.open(img['image_path'])
         caption = img['caption']
-        print(image)
+        display(image)
         print(caption)
+        
+download_images()
 

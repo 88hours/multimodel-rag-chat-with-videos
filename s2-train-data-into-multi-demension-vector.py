@@ -1,18 +1,9 @@
-import json
-import os
 import numpy as np
 from numpy.linalg import norm
-import cv2
-from io import StringIO, BytesIO
-from umap import UMAP
-from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
-from tqdm import tqdm
-import base64
-from transformers import BridgeTowerProcessor, BridgeTowerForContrastiveLearning, BridgeTowerForImageAndTextRetrieval, BridgeTowerForMaskedLM
-import requests
-from PIL import Image
+from transformers import BridgeTowerProcessor, BridgeTowerForContrastiveLearning
 import torch
+from PIL import Image
+
 
 url1='http://farm3.staticflickr.com/2519/4126738647_cc436c111b_z.jpg'
 cap1='A motorcycle sits parked across from a herd of livestock'
@@ -26,19 +17,22 @@ cap3='a cat laying down stretched out near a laptop'
 img1 = {
   'flickr_url': url1,
   'caption': cap1,
-  'image_path' : './shared_data/motorcycle_1.jpg'
+  'image_path' : './shared_data/motorcycle_1.jpg',
+  'tensor_path' : './shared_data/motorcycle_1'
 }
 
 img2 = {
     'flickr_url': url2,
     'caption': cap2,
-    'image_path' : './shared_data/motorcycle_2.jpg'
+    'image_path' : './shared_data/motorcycle_2.jpg',
+    'tensor_path' : './shared_data/motorcycle_2'
 }
 
 img3 = {
     'flickr_url' : url3,
     'caption': cap3,
-    'image_path' : './shared_data/cat_1.jpg'
+    'image_path' : './shared_data/cat_1.jpg',
+    'tensor_path' : './shared_data/cat_1'
 }
 
 def bt_embeddings_from_local(text, image):
@@ -48,7 +42,6 @@ def bt_embeddings_from_local(text, image):
 
     processed_inputs  = processor(image, text, padding=True, return_tensors="pt")
 
-    #inputs  = processor(prompt, base64_image, padding=True, return_tensors="pt")
     outputs = model(**processed_inputs)
 
     cross_modal_embeddings = outputs.cross_embeds
@@ -59,8 +52,16 @@ def bt_embeddings_from_local(text, image):
         'text_embeddings': text_embeddings,
         'image_embeddings': image_embeddings
     }
-    
 
-for img in [img1, img2, img3]:
-    embeddings = bt_embeddings_from_local(img['caption'], Image.open(img['image_path']))
-    print(embeddings['cross_modal_embeddings'][0].shape)
+def cosine_similarity(vec1, vec2):
+    similarity = np.dot(vec1,vec2)/(norm(vec1)*norm(vec2))
+    return similarity
+
+
+def save_embeddings():
+    for img in [img1, img2, img3]:
+        embedding = bt_embeddings_from_local(img['caption'], Image.open(img['image_path']))
+        print(embedding['cross_modal_embeddings'][0].shape) #<class 'torch.Tensor'>
+        torch.save(embedding['cross_modal_embeddings'][0], img['tensor_path'] + '.pt')
+    
+save_embeddings()
