@@ -53,11 +53,6 @@ def bt_embeddings_from_local(text, image):
         'image_embeddings': image_embeddings
     }
 
-def cosine_similarity(vec1, vec2):
-    similarity = np.dot(vec1,vec2)/(norm(vec1)*norm(vec2))
-    return similarity
-
-
 def save_embeddings():
     for img in [img1, img2, img3]:
         embedding = bt_embeddings_from_local(img['caption'], Image.open(img['image_path']))
