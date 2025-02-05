@@ -102,8 +102,10 @@ def bt_with_masked_input():
 
     print(results)
     return results
-#res = bt_embeddingsl()
-#print((res['text_embeddings']))
-for img in [img1, img2, img3]:
-    embeddings = bt_embeddings_from_local(img['caption'], Image.open(img['image_path']))
-    print(embeddings['cross_modal_embeddings'][0].shape)
+
+if __name__ == "__main__":
+    #res = bt_embeddingsl()
+    #print((res['text_embeddings']))
+    for img in [img1, img2, img3]:
+        embeddings = bt_embeddings_from_local(img['caption'], Image.open(img['image_path']))
+        print(embeddings['cross_modal_embeddings'][0].shape)

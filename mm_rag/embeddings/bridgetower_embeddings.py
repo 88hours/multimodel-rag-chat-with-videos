@@ -3,9 +3,10 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.pydantic_v1 import (
     BaseModel,
 )
+from lrn_vector_embeddings import bt_embeddings_from_local
 from utility import encode_image, bt_embedding_from_prediction_guard
 from tqdm import tqdm
-
+from PIL import Image
 class BridgeTowerEmbeddings(BaseModel, Embeddings):
     """ BridgeTower embedding model """
         
@@ -51,6 +52,6 @@ class BridgeTowerEmbeddings(BaseModel, Embeddings):
 
         embeddings = []
         for path_to_img, text in tqdm(zip(images, texts), total=len(texts)):
-            embedding = bt_embedding_from_prediction_guard(text, encode_image(path_to_img))
+            embedding = bt_embeddings_from_local(text, Image.open(path_to_img))
             embeddings.append(embedding)
         return embeddings

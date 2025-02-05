@@ -14,4 +14,6 @@ whisper
 webvtt-py
 tqdm
 lancedb
-mmrag
+langchain-core
+langchain-community
+ollama
