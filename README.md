@@ -107,6 +107,12 @@ _ = MultimodalLanceDB.from_text_image_pairs(
     Token Decoding: BridgeTower contrastive learning model works with embeddings, not token predictions
     Install from git+https://github.com/openai/whisper.git 
 
+# Install ffmepg using brew
+    ```bash
+        brew install ffmpeg
+        brew link ffmpeg
+    ```
+
 #Future
     Stream model from Hugging Face, instead of download
         - Example: (https://medium.com/@arthur.lagacherie/two-easy-ways-to-stream-output-from-any-huggingface-model-4c70d6a0cf88)
