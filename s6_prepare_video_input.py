@@ -10,6 +10,7 @@ from PIL import Image
 import base64
 from utility import download_video, encode_image, extract_meta_data, get_transcript_vtt, getSubs, lvlm_inference
 from urllib.request import urlretrieve
+from IPython.display import display
 
 def demp_video_input_that_has_transcript():  
     # first video's url
@@ -72,7 +73,12 @@ def basic_lvlm_use(path_to_frame):
 if __name__ == "__main__":
     #meta_data = demp_video_input_that_has_transcript()
     
-    #meta_data = demp_video_input_that_has_no_transcript()
-    basic_lvlm_use('shared_data/videos/video2/extracted_frame/frame_0.jpg')
+    meta_data = demp_video_input_that_has_no_transcript()
+    data = meta_data[1]
+    caption = data['transcript']
+    print(f'Generated caption is: "{caption}"')
+    frame = Image.open(data['extracted_frame_path'])
+    display(frame)
+    #basic_lvlm_use('shared_data/videos/video2/extracted_frame/frame_0.jpg')
     #print(meta_data)
     
