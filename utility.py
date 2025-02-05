@@ -598,3 +598,64 @@ def extract_meta_data(vid_dir, vid_filepath, vid_transcript_filepath):
                     metadatas_path,
                 )
     return metadatas
+
+# function extract_and_save_frames_and_metadata_with_fps
+#   receives as input a video 
+#   does extracting and saving frames and their metadatas
+#   returns the extracted metadatas
+def extract_and_save_frames_and_metadata_with_fps(
+        lvlm_prompt,
+        path_to_video,  
+        path_to_save_extracted_frames,
+        path_to_save_metadatas,
+        num_of_extracted_frames_per_second=1):
+    
+    # metadatas will store the metadata of all extracted frames
+    metadatas = []
+
+    # load video using cv2
+    video = cv2.VideoCapture(path_to_video)
+    
+    # Get the frames per second
+    fps = video.get(cv2.CAP_PROP_FPS)
+    # Get hop = the number of frames pass before a frame is extracted
+    hop = round(fps / num_of_extracted_frames_per_second) 
+    curr_frame = 0
+    idx = -1
+    while(True):
+        # iterate all frames
+        ret, frame = video.read()
+        if not ret: 
+            break
+        if curr_frame % hop == 0:
+            idx = idx + 1
+        
+            # if the frame is extracted successfully, resize it
+            image = maintain_aspect_ratio_resize(frame, height=350)
+            # save frame as JPEG file
+            img_fname = f'frame_{idx}.jpg'
+            img_fpath = osp.join(
+                            path_to_save_extracted_frames, 
+                            img_fname
+                        )
+            cv2.imwrite(img_fpath, image)
+
+            # generate caption using lvlm_inference
+            b64_image = encode_image(img_fpath)
+            caption = lvlm_inference(lvlm_prompt, b64_image)
+                
+            # prepare the metadata
+            metadata = {
+                'extracted_frame_path': img_fpath,
+                'transcript': caption,
+                'video_segment_id': idx,
+                'video_path': path_to_video,
+            }
+            metadatas.append(metadata)
+        curr_frame += 1
+        
+    # save metadata of all extracted frames
+    metadatas_path = osp.join(path_to_save_metadatas,'metadatas.json')
+    with open(metadatas_path, 'w') as outfile:
+        json.dump(metadatas, outfile)
+    return metadatas

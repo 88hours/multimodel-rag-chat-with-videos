@@ -8,7 +8,7 @@ import whisper
 from moviepy import VideoFileClip, TextClip, CompositeVideoClip
 from PIL import Image
 import base64
-from utility import download_video, extract_meta_data, get_transcript_vtt, getSubs
+from utility import download_video, encode_image, extract_meta_data, get_transcript_vtt, getSubs, lvlm_inference
 from urllib.request import urlretrieve
 
 def demp_video_input_that_has_transcript():  
@@ -62,10 +62,17 @@ def demp_video_input_that_has_no_transcript():
         f.write(vtt)
 
     return extract_meta_data(vid_dir, vid_filepath, path_to_generated_trans)
-                     
+
+def basic_lvlm_use(path_to_frame):
+    lvlm_prompt = "Can you describe the image?"
+    image = encode_image(path_to_frame)
+    caption = lvlm_inference(lvlm_prompt, image)
+    return caption  
+
 if __name__ == "__main__":
-    #demp_video_input_that_has_no_transcript()
     #meta_data = demp_video_input_that_has_transcript()
-    meta_data = demp_video_input_that_has_no_transcript()
-    print(meta_data)
+    
+    #meta_data = demp_video_input_that_has_no_transcript()
+    basic_lvlm_use('shared_data/videos/video2/extracted_frame/frame_0.jpg')
+    #print(meta_data)
     
