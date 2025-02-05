@@ -113,7 +113,44 @@ _ = MultimodalLanceDB.from_text_image_pairs(
         brew link ffmpeg
     ```
 
-#Future
-    Stream model from Hugging Face, instead of download
-        - [Example:](https://medium.com/@arthur.lagacherie/two-easy-ways-to-stream-output-from-any-huggingface-model-4c70d6a0cf88)
-        - [Simplify:]https://blog.lancedb.com/multimodal-rag-applications/
+        
+# Learning and Skills
+
+## Technical Skills:
+
+    Basic Machine learning and deep learning
+    Vector embeddings and similarity search
+    Multimodal data processing
+    
+## Framework & Library Expertise:
+
+    Hugging Face Transformers
+    Gradio UI development
+    LangChain integration (Basic)
+    PyTorch basics
+    LanceDB vector storage
+
+## AI/ML Concepts:
+
+    Multimodal RAG system architecture
+    Vector embeddings and similarity search
+    Large Language Models (LLaVA)
+    Image-text pair processing
+    Dimensionality reduction techniques
+
+
+## Multimedia Processing:
+
+    Video frame extraction
+    Audio transcription (Whisper)
+    Image processing (PIL)
+    Base64 encoding/decoding
+    WebVTT handling
+    
+## System Design:
+
+    Client-server architecture
+    API endpoint design
+    Data pipeline construction
+    Vector store implementation
+    Multimodal system integration
