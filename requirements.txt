@@ -9,3 +9,7 @@ transformers
 matplotlib
 seaborn
 datasets
+moviepy
+whisper
+webvtt-py
+tqdm

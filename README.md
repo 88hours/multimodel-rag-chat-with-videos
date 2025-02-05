@@ -105,6 +105,7 @@ _ = MultimodalLanceDB.from_text_image_pairs(
     Model Size: BridgeTower model requires ~3.5GB download
     Image Downloads: Some Flickr images may be unavailable; implement robust error handling
     Token Decoding: BridgeTower contrastive learning model works with embeddings, not token predictions
+    Install from git+https://github.com/openai/whisper.git 
 
 #Future
     Stream model from Hugging Face, instead of download
