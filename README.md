@@ -1,6 +1,6 @@
-# Journey into Learning/Disecting - 4:00 PM  
+# Journey into Learning/Disecting
 
-[**Interactive Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
+[**Interactive Video Chat Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
 
 ### A multimodal AI system should be able to understand both text and video content.  
 
@@ -105,3 +105,7 @@ _ = MultimodalLanceDB.from_text_image_pairs(
     Model Size: BridgeTower model requires ~3.5GB download
     Image Downloads: Some Flickr images may be unavailable; implement robust error handling
     Token Decoding: BridgeTower contrastive learning model works with embeddings, not token predictions
+
+#Future
+    Stream model from Hugging Face, instead of download
+        - Example: (https://medium.com/@arthur.lagacherie/two-easy-ways-to-stream-output-from-any-huggingface-model-4c70d6a0cf88)
