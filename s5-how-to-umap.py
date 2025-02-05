@@ -1,3 +1,4 @@
+from os import path
 from IPython.display import display
 from umap import UMAP
 from sklearn.preprocessing import MinMaxScaler
@@ -9,7 +10,8 @@ from s2_download_data import load_data_from_huggingface
 from utils import prepare_dataset_for_umap_visualization as data_prep
 from s3_data_to_vector_embedding import bt_embeddings_from_local
 import random
-
+import numpy as np
+import torch
 # prompt templates
 templates = [
     'a picture of {}',
@@ -35,54 +37,63 @@ def data_prep(hf_dataset_name, templates=templates, test_size=1000):
         })
     return img_txt_pairs
     
-# prepare image_text pairs 
-
-# for the first 50 data of Huggingface dataset 
-#  "yashikota/cat-image-dataset"
-cat_img_txt_pairs = data_prep("yashikota/cat-image-dataset", 
-                             "cat", test_size=50)
-
-# for the first 50 data of Huggingface dataset 
-#  "tanganke/stanford_cars"
-car_img_txt_pairs = data_prep("tanganke/stanford_cars", 
-                             "car", test_size=50)
-
-# display an example of a cat image-text pair data
-display(cat_img_txt_pairs[0]['caption'])
-display(cat_img_txt_pairs[0]['pil_img'])
-
-# display an example of a car image-text pair data
-display(car_img_txt_pairs[0]['caption'])
-display(car_img_txt_pairs[0]['pil_img'])
-
 # compute BridgeTower embeddings for cat image-text pairs
 def load_cat_and_car_embeddings():
-    
+        
+    # prepare image_text pairs 
+
+    # for the first 50 data of Huggingface dataset 
+    #  "yashikota/cat-image-dataset"
+    cat_img_txt_pairs = data_prep("yashikota/cat-image-dataset", 
+                                "cat", test_size=50)
+
+    # for the first 50 data of Huggingface dataset 
+    #  "tanganke/stanford_cars"
+    car_img_txt_pairs = data_prep("tanganke/stanford_cars", 
+                                "car", test_size=50)
+
+    # display an example of a cat image-text pair data
+    display(cat_img_txt_pairs[0]['caption'])
+    display(cat_img_txt_pairs[0]['pil_img'])
+
+    # display an example of a car image-text pair data
+    display(car_img_txt_pairs[0]['caption'])
+    display(car_img_txt_pairs[0]['pil_img'])
+
+    def save_embeddings(embedding, path):
+        torch.save(embedding, path)
+
     def load_embeddings(img_txt_pair):
         pil_img = img_txt_pair['pil_img']
         caption = img_txt_pair['caption']
         return bt_embeddings_from_local(caption, pil_img)
     
-    cat_embeddings = []
-    for img_txt_pair in tqdm(
+    def load_all_embeddings_from_image_text_pairs(file_name):
+        cat_embeddings = []
+        for img_txt_pair in tqdm(
                             cat_img_txt_pairs, 
                             total=len(cat_img_txt_pairs)
                         ):
-        pil_img = img_txt_pair['pil_img']
-        caption = img_txt_pair['caption']
-        embedding =load_embeddings(caption, pil_img)
-        cat_embeddings.append(embedding)
+            pil_img = img_txt_pair['pil_img']
+            caption = img_txt_pair['caption']
+            embedding = load_embeddings(caption, pil_img)
+            cat_embeddings.append(embedding)
+            save_embeddings(cat_embeddings, file_name)
+            return cat_embeddings
+    
 
-    # compute BridgeTower embeddings for car image-text pairs
+    cat_embeddings = []
     car_embeddings = []
-    for img_txt_pair in tqdm(
-                            car_img_txt_pairs, 
-                            total=len(car_img_txt_pairs)
-                        ):
-        pil_img = img_txt_pair['pil_img']
-        caption = img_txt_pair['caption']
-        embedding = load_embeddings(caption, pil_img)
-        car_embeddings.append(embedding)
+    if (path.exists('./shared_data/cat_embeddings.pt')):
+        cat_embeddings = torch.load('./shared_data/cat_embeddings.pt')
+    else:
+        cat_embeddings = load_all_embeddings_from_image_text_pairs('./shared_data/cat_embeddings.pt')
+    
+    if (path.exists('./shared_data/car_embeddings.pt')):
+        car_embeddings = torch.load('./shared_data/car_embeddings.pt') 
+    else:
+        car_embeddings = load_all_embeddings_from_image_text_pairs('./shared_data/car_embeddings.pt')
+    
     return cat_embeddings, car_embeddings
                         
 
@@ -124,3 +135,5 @@ def show_umap_visualization():
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.show()
+    
+load_cat_and_car_embeddings()
