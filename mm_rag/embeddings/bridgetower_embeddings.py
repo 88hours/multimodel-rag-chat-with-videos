@@ -21,7 +21,7 @@ class BridgeTowerEmbeddings(BaseModel, Embeddings):
         """
         embeddings = []
         for text in texts:
-            embedding = bt_embedding_from_prediction_guard(text, "")
+            embedding = bt_embeddings_from_local(text, "")
             embeddings.append(embedding)
         return embeddings
 
