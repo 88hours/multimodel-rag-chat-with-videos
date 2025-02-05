@@ -26,6 +26,7 @@ import dataclasses
 import random
 from datasets import load_dataset
 from os import path as osp
+from IPython.display import display
 from langchain_core.prompt_values import PromptValue
 from langchain_core.messages import (
     MessageLikeRepresentation,
@@ -335,7 +336,8 @@ def display_retrieved_results(results):
     for i, res in enumerate(results):
         print(f'The caption of the {str(i+1)}-th retrieved result is:\n"{results[i].page_content}"')
         print()
-        display(Image.open(results[i].metadata['metadata']['extracted_frame_path']))
+        print(results[i])
+        #display(Image.open(results[i].metadata['metadata']['extracted_frame_path']))
         print("------------------------------------------------------------")
 
 class SeparatorStyle(Enum):

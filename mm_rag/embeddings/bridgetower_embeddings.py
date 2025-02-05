@@ -1,5 +1,6 @@
 from typing import List
 from langchain_core.embeddings import Embeddings
+import torch
 from transformers import (
     BridgeTowerProcessor, 
     BridgeTowerForContrastiveLearning
@@ -23,22 +24,39 @@ class BridgeTowerEmbeddings(BaseModel, Embeddings):
         Returns:
             List of embeddings, one for each text.
         """
+        
         embeddings = []
+        img = Image.new('RGB', (100, 100))
         for text in texts:
-            embedding = bt_embeddings_from_local(text, "")
+            embedding = bt_embeddings_from_local(text, img)
             embeddings.append(embedding)
         return embeddings
-
+    
     def embed_query(self, text: str) -> List[float]:
         """Embed a query using BridgeTower.
-
+        
         Args:
             text: The text to embed.
-
+        
         Returns:
-            Embeddings for the text.
+            Embeddings for the text as a flat list of floats.
         """
-        return self.embed_documents([text])[0]
+        # Get embeddings
+        embeddings = self.embed_documents([text])[0]
+        
+        # If embeddings is a dict, extract the text embeddings
+        if isinstance(embeddings, dict):
+            embeddings = embeddings["text_embeddings"]
+        
+        # If embeddings is a nested list or tensor, flatten it
+        if isinstance(embeddings, (list, torch.Tensor)) and len(embeddings) == 1:
+            embeddings = embeddings[0]
+        
+        # Convert tensor to list if needed
+        if torch.is_tensor(embeddings):
+            embeddings = embeddings.detach().tolist()
+            
+        return embeddings
 
     
     def embed_image_text_pairs(self, texts: List[str], images: List[str], batch_size=2) -> List[List[float]]:
