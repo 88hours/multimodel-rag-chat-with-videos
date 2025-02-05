@@ -1,5 +1,9 @@
 from typing import List
 from langchain_core.embeddings import Embeddings
+from transformers import (
+    BridgeTowerProcessor, 
+    BridgeTowerForContrastiveLearning
+)
 from langchain_core.pydantic_v1 import (
     BaseModel,
 )
@@ -36,6 +40,7 @@ class BridgeTowerEmbeddings(BaseModel, Embeddings):
         """
         return self.embed_documents([text])[0]
 
+    
     def embed_image_text_pairs(self, texts: List[str], images: List[str], batch_size=2) -> List[List[float]]:
         """Embed a list of image-text pairs using BridgeTower.
 
@@ -49,9 +54,18 @@ class BridgeTowerEmbeddings(BaseModel, Embeddings):
 
         # the length of texts must be equal to the length of images
         assert len(texts)==len(images), "the len of captions should be equal to the len of images"
-
+        
+        processor = BridgeTowerProcessor.from_pretrained("BridgeTower/bridgetower-large-itm-mlm-itc")
+        model = BridgeTowerForContrastiveLearning.from_pretrained("BridgeTower/bridgetower-large-itm-mlm-itc")
+    
+ 
+                
         embeddings = []
         for path_to_img, text in tqdm(zip(images, texts), total=len(texts)):
-            embedding = bt_embeddings_from_local(text, Image.open(path_to_img))
+            inputs = processor(text=[text], images=[Image.open(path_to_img)], return_tensors="pt")
+            outputs = model(**inputs)
+            # Get embeddings and convert to list
+            embedding = outputs.text_embeds.detach().numpy().tolist()[0]
             embeddings.append(embedding)
+        
         return embeddings
