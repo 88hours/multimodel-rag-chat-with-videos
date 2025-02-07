@@ -1,5 +1,7 @@
 # ReArchitecture Multimodal RAG System Pipeline Journey
-Now it is simplified, refactored, bug-fixed, removed prediction guard, isolated each concept into a step as Python runnable
+I ported it locally and isolated each concept into a step as Python runnable
+It is simplified, refactored and bug-fixed now.
+I migrated from Prediction Guard to HuggingFace.
 
 [**Interactive Video Chat Demo and Multimodal RAG System Architecture**](https://learn.deeplearning.ai/courses/multimodal-rag-chat-with-videos/lesson/2/interactive-demo-and-multimodal-rag-system-architecture)  
 
