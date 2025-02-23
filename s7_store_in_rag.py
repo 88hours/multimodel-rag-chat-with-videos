@@ -99,8 +99,7 @@ def store_in_rag():
     )
 
 if __name__ == "__main__":
-    store_in_rag()
     tbl  = db.open_table(TBL_NAME)
     print(f"There are {tbl.to_pandas().shape[0]} rows in the table")
     #display the first 3 rows of the table
-    #return_top_k_most_similar_docs()
+    return_top_k_most_similar_docs()
