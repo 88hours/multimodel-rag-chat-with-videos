@@ -7,9 +7,9 @@ from pathlib import Path
 import os
 from enum import auto, Enum
 from typing import List, Tuple, Any
-from utils import prediction_guard_llava_conv
+from utility import prediction_guard_llava_conv
 import lancedb
-from utils import load_json_file
+from utility import load_json_file
 from mm_rag.embeddings.bridgetower_embeddings import BridgeTowerEmbeddings
 from mm_rag.vectorstores.multimodal_lancedb import MultimodalLanceDB
 from mm_rag.MLM.client import PredictionGuardClient
@@ -17,7 +17,7 @@ from mm_rag.MLM.lvlm import LVLM
 from PIL import Image
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
 from moviepy.video.io.VideoFileClip import VideoFileClip
-from utils import prediction_guard_llava_conv, encode_image, Conversation, lvlm_inference_with_conversation
+from utility import prediction_guard_llava_conv, encode_image, Conversation, lvlm_inference_with_conversation
 
 server_error_msg="**NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.**"
 

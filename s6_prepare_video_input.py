@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 from os import path as osp
 import json
-import cv2
 import webvtt
 import whisper
 from moviepy import VideoFileClip, TextClip, CompositeVideoClip
@@ -11,6 +10,7 @@ import base64
 from utility import download_video, encode_image, extract_meta_data, get_transcript_vtt, getSubs, lvlm_inference
 from urllib.request import urlretrieve
 from IPython.display import display
+import ollama
 
 def demp_video_input_that_has_transcript():  
     # first video's url
@@ -70,6 +70,18 @@ def basic_lvlm_use(path_to_frame):
     caption = lvlm_inference(lvlm_prompt, image)
     return caption  
 
+def ask_llvm(instruction, file_path):
+    result = ollama.generate(
+        model='llava',
+        prompt=instruction,
+        images=[file_path],
+        stream=False
+    )['response']
+    img=Image.open(file_path, mode='r')
+    img = img.resize([int(i/1.2) for i in img.size])
+    display(img) 
+    for i in result.split('.'):
+        print(i, end='', flush=True)
 if __name__ == "__main__":
     #meta_data = demp_video_input_that_has_transcript()
     
@@ -79,6 +91,7 @@ if __name__ == "__main__":
     print(f'Generated caption is: "{caption}"')
     frame = Image.open(data['extracted_frame_path'])
     display(frame)
-    #basic_lvlm_use('shared_data/videos/video2/extracted_frame/frame_0.jpg')
+    instruction = "Can you describe the image?"
+    ask_llvm(instruction,'shared_data/videos/video2/extracted_frame/frame_0.jpg')
     #print(meta_data)
     

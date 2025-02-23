@@ -17,3 +17,5 @@ lancedb
 langchain-core
 langchain-community
 ollama
+opencv-python
+openai-whisper
