@@ -64,11 +64,7 @@ def demp_video_input_that_has_no_transcript():
 
     return extract_meta_data(vid_dir, vid_filepath, path_to_generated_trans)
 
-def basic_lvlm_use(path_to_frame):
-    lvlm_prompt = "Can you describe the image?"
-    image = encode_image(path_to_frame)
-    caption = lvlm_inference(lvlm_prompt, image)
-    return caption  
+
 
 def ask_llvm(instruction, file_path):
     result = ollama.generate(
@@ -83,15 +79,15 @@ def ask_llvm(instruction, file_path):
     for i in result.split('.'):
         print(i, end='', flush=True)
 if __name__ == "__main__":
-    #meta_data = demp_video_input_that_has_transcript()
+    meta_data = demp_video_input_that_has_transcript()
     
-    meta_data = demp_video_input_that_has_no_transcript()
-    data = meta_data[1]
+    meta_data1 = demp_video_input_that_has_no_transcript()
+    data = meta_data1[1]
     caption = data['transcript']
     print(f'Generated caption is: "{caption}"')
     frame = Image.open(data['extracted_frame_path'])
     display(frame)
     instruction = "Can you describe the image?"
-    ask_llvm(instruction,'shared_data/videos/video2/extracted_frame/frame_0.jpg')
+    ask_llvm(instruction, data['extracted_frame_path'])
     #print(meta_data)
     
