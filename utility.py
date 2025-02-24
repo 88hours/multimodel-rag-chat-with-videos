@@ -99,22 +99,25 @@ def download_video(video_url, path='/tmp/'):
 
     filepath = glob.glob(os.path.join(path, '*.mp4'))
     if len(filepath) > 0:
+        print('Video already downloaded')
         return filepath[0]
 
     def progress_callback(stream: Stream, data_chunk: bytes, bytes_remaining: int) -> None:
         pbar.update(len(data_chunk))
     
     yt = YouTube(video_url, on_progress_callback=progress_callback)
-    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='720p').desc().first()
+    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='480p').desc().first()
     if stream is None:
         stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
     if not os.path.exists(path):
         os.makedirs(path)
-    filepath = os.path.join(path, stream.default_filename)
+    filename = stream.default_filename.replace(' ', '_')
+    filepath = os.path.join(path, filename)
+    
     if not os.path.exists(filepath):   
         print('Downloading video from YouTube...')
         pbar = tqdm(desc='Downloading video from YouTube', total=stream.filesize, unit="bytes")
-        stream.download(path)
+        stream.download(path, filename=filename)
         pbar.close()
     return filepath
 

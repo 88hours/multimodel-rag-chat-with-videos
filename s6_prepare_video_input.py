@@ -1,13 +1,10 @@
 from pathlib import Path
 import os
 from os import path as osp
-import json
-import webvtt
 import whisper
-from moviepy import VideoFileClip, TextClip, CompositeVideoClip
+from moviepy import VideoFileClip
 from PIL import Image
-import base64
-from utility import download_video, encode_image, extract_meta_data, get_transcript_vtt, getSubs, lvlm_inference
+from utility import download_video, extract_meta_data, get_transcript_vtt, getSubs
 from urllib.request import urlretrieve
 from IPython.display import display
 import ollama
