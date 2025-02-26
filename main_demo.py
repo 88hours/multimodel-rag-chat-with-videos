@@ -123,7 +123,7 @@ def process_url_and_init(youtube_url):
 
 def init_ui():
     with gr.Blocks() as demo:
-        url_input = gr.Textbox(label="Enter YouTube URL", value="https://www.youtube.com/watch?v=7Hcg-rLYwdM")
+        url_input = gr.Textbox(label="Enter YouTube URL", value="https://www.youtube.com/watch?v=7Hcg-rLYwdM", interactive=False)
         submit_btn = gr.Button("Process Video")
         #vid_filepath = 'shared_data/videos/yt_video/Welcome_back_to_Planet_Earth.mp4'
         chatbox = gr.Textbox(label="What question do you want to ask?", value="show me a group of astronauts")
@@ -138,5 +138,5 @@ def init_ui():
 
 if __name__ == '__main__':
     demo = init_ui()
-    demo.launch()
+    demo.launch(True)
     
