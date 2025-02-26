@@ -1,6 +1,8 @@
-myenv/*
-__pycache__/*
+myenv
+__pycache__
 mm_rag/*
-shared_data/*
+shared_data
 .gradio
 .env
+.venv
+.github

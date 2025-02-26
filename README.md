@@ -1,3 +1,9 @@
+---
+title: multimodel-rag-chat-with-videos
+app_file: main_demo.py
+sdk: gradio
+sdk_version: 5.17.1
+---
 # ReArchitecture Multimodal RAG System Pipeline Journey
 I ported it locally and isolated each concept into a step as Python runnable
 It is simplified, refactored and bug-fixed now.
