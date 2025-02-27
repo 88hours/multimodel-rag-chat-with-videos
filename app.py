@@ -64,8 +64,7 @@ def store_in_rag(vid_metadata_path):
 
     parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
 
-    vid_table_name = os.path.dirname(parent_dir_name)
-    vid_table_name = f"{vid_table_name}_table"
+    vid_table_name = f"{parent_dir_name}_table"
     print("TABLE NAME ", vid_table_name)
     _ = MultimodalLanceDB.from_text_image_pairs(
         texts=updated_vid_subs,
@@ -76,21 +75,25 @@ def store_in_rag(vid_metadata_path):
         table_name=vid_table_name,
         mode="overwrite", 
     )
+    return vid_table_name
 
 def get_metadata_of_yt_video_with_captions(vid_url):  
     vid_filepath, vid_folder_path, is_downloaded = download_video(vid_url, base_dir)
-    if not is_downloaded:
-        print("Video found at ", vid_filepath)
-        return vid_filepath
+    if is_downloaded:
+        print("Video downloaded at ", vid_filepath)
     
-    print("Video not found and downloading transcript")
+    print("checking transcript")
     vid_transcript_filepath = get_transcript_vtt(vid_folder_path, vid_url, vid_filepath)
-    print("Video not found and extracting")
-    extract_meta_data(vid_folder_path, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
-    #vid_metadata_path = f"{vid_folder_path}/metadatas.json"
-    #
-    # store_in_rag(vid_metadata_path)
-    #open_table()
+    vid_metadata_path = f"{vid_folder_path}/metadatas.json"
+    print("checking metadatas at", vid_metadata_path)
+    if os.path.exists(vid_metadata_path):
+        print('Metadatas already exists')
+    else
+        extract_meta_data(vid_folder_path, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
+    
+    vid_table_name= store_in_rag(vid_metadata_path)
+    print("Table name ", vid_table_name)
+    open_table(vid_table_name)
     return vid_filepath
 
 """ 

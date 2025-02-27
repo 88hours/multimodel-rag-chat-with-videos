@@ -155,6 +155,7 @@ def get_transcript_vtt(path, video_url, vid_filepath):
     video_id = get_video_id_from_url(video_url)
     filepath = os.path.join(path,'captions.vtt')
     if os.path.exists(filepath):
+        print('Transcript already exists')
         return filepath
 
     transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en-GB', 'en'])
