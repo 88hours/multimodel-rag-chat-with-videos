@@ -92,34 +92,36 @@ def prepare_dataset_for_umap_visualization(hf_dataset, class_name, templates=tem
     return img_txt_pairs
     
 
-def download_video(video_url, path='/tmp/'):
+def download_video(video_url, path):
     print(f'Getting video information for {video_url}')
-    if not video_url.startswith('http'):
-        return os.path.join(path, video_url)
-
-    filepath = glob.glob(os.path.join(path, '*.mp4'))
-    if len(filepath) > 0:
-        print('Video already downloaded')
-        return filepath[0]
 
     def progress_callback(stream: Stream, data_chunk: bytes, bytes_remaining: int) -> None:
         pbar.update(len(data_chunk))
     
     yt = YouTube(video_url, on_progress_callback=progress_callback)
-    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='480p').desc().first()
+    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='320p').desc().first()
     if stream is None:
         stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-    if not os.path.exists(path):
-        os.makedirs(path)
-    filename = stream.default_filename.replace(' ', '_')
-    filepath = os.path.join(path, filename)
+
+    filename = stream.default_filename.replace(' ', '').lower()
+    filename_without_extension = os.path.splitext(filename)[0]
+
+    folder_path = os.path.join(path, filename_without_extension)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path, exist_ok=True)
+
+    filepath = os.path.join(folder_path, filename)
+    print(f'Checking if video already downloaded at {filepath}')
+    if os.path.exists(filepath):   
+        print('Video already downloaded')
+        return filepath[0], folder_path
     
     if not os.path.exists(filepath):   
         print('Downloading video from YouTube...')
         pbar = tqdm(desc='Downloading video from YouTube', total=stream.filesize, unit="bytes")
-        stream.download(path, filename=filename)
+        stream.download(folder_path, filename=filename)
         pbar.close()
-    return filepath
+    return filepath, folder_path
 
 def get_video_id_from_url(video_url):
     """
@@ -145,7 +147,7 @@ def get_video_id_from_url(video_url):
     return video_url
     
 # if this has transcript then download
-def get_transcript_vtt(video_url, path='/tmp'):
+def get_transcript_vtt(path, video_url, vid_filepath):
     video_id = get_video_id_from_url(video_url)
     filepath = os.path.join(path,'captions.vtt')
     if os.path.exists(filepath):

@@ -18,28 +18,27 @@ import pyarrow as pa
 # declare host file
 LANCEDB_HOST_FILE = "./shared_data/.lancedb"
 # declare table name
-TBL_NAME = "demo_tbl"
 # initialize vectorstore
 db = lancedb.connect(LANCEDB_HOST_FILE)
 # initialize an BridgeTower embedder 
 embedder = BridgeTowerEmbeddings()
 
-vid_dir = "./shared_data/videos/yt_video"
-Path(vid_dir).mkdir(parents=True, exist_ok=True)
+base_dir = "./shared_data/videos/yt_video"
+Path(base_dir).mkdir(parents=True, exist_ok=True)
 
 
-def open_table():
+def open_table(table_name):
     # open a connection to table TBL_NAME
-    tbl = db.open_table(TBL_NAME)
+    tbl = db.open_table(table_name)
 
     print(f"There are {tbl.to_pandas().shape[0]} rows in the table")
     # display the first 3 rows of the table
     tbl.to_pandas()[['text', 'image_path']].head(3)
 
-def store_in_rag():
+def store_in_rag(vid_metadata_path):
 
     # load metadata files
-    vid_metadata_path = './shared_data/videos/yt_video/metadatas.json'
+    
     vid_metadata = load_json_file(vid_metadata_path)
 
 
@@ -62,22 +61,28 @@ def store_in_rag():
     # to add more entries to the vector store
     # in case you want to start with a fresh vector store,
     # you can pass in mode="overwrite" instead 
+    print(os.path.dirname(vid_metadata_path))
 
+    parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
+    print(parent_dir_name)
+
+    table_name = os.path.dirname(parent_dir_name)
     _ = MultimodalLanceDB.from_text_image_pairs(
         texts=updated_vid_subs,
         image_paths=vid_img_path,
         embedding=embedder,
         metadatas=vid_metadata,
         connection=db,
-        table_name=TBL_NAME,
+        table_name=table_name,
         mode="overwrite", 
     )
 
 def get_metadata_of_yt_video_with_captions(vid_url):  
-    vid_filepath = download_video(vid_url, vid_dir)
-    vid_transcript_filepath = get_transcript_vtt(vid_url, vid_dir)
-    extract_meta_data(vid_dir, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
-    store_in_rag()
+    vid_filepath, vid_folder_path = download_video(vid_url, base_dir)
+    vid_transcript_filepath = get_transcript_vtt(vid_folder_path, vid_url, vid_filepath)
+    extract_meta_data(vid_folder_path, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
+    vid_metadata_path = f"{vid_folder_path}/metadatas.json"
+    store_in_rag(vid_metadata_path)
     open_table()
     return vid_filepath
 
@@ -94,13 +99,14 @@ def chat_response_llvm(instruction):
     return result
      """
 
-def return_top_k_most_similar_docs(query="show me a group of astronauts", max_docs=1):
+def return_top_k_most_similar_docs(vid_metadata_path, query="show me a group of astronauts", max_docs=1):
     # ask to return top 3 most similar documents
         # Creating a LanceDB vector store 
+    table_name = os.path.dirname(vid_metadata_path)
     vectorstore = MultimodalLanceDB(
         uri=LANCEDB_HOST_FILE, 
         embedding=embedder, 
-        table_name=TBL_NAME)
+        table_name=table_name)
 
     # creating a retriever for the vector store
     # search_type="similarity" 
@@ -123,7 +129,8 @@ def process_url_and_init(youtube_url):
 
 def init_ui():
     with gr.Blocks() as demo:
-        url_input = gr.Textbox(label="Enter YouTube URL", value="https://www.youtube.com/watch?v=7Hcg-rLYwdM", interactive=False)
+        url_input = gr.Textbox(label="Enter YouTube URL", value="https://www.youtube.com/watch?v=7Hcg-rLYwdM", interactive=True)
+        print(url_input)
         submit_btn = gr.Button("Process Video")
         #vid_filepath = 'shared_data/videos/yt_video/Welcome_back_to_Planet_Earth.mp4'
         chatbox = gr.Textbox(label="What question do you want to ask?", value="show me a group of astronauts")
