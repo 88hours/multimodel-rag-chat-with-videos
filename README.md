@@ -6,7 +6,7 @@ sdk_version: 5.17.1
 ---
 
 # Demo
-## Sample Vide
+## Sample Video
     - https://www.youtube.com/watch?v=kOEDG3j1bjs
     - https://www.youtube.com/watch?v=7Hcg-rLYwdM
 ## Questions
