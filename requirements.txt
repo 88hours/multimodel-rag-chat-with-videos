@@ -19,3 +19,4 @@ langchain-community
 ollama
 opencv-python
 openai-whisper
+huggingface_hub[cli]
