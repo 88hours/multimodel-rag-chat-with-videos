@@ -66,7 +66,7 @@ def store_in_rag(vid_table_name, vid_metadata_path):
     # you can pass in mode="overwrite" instead 
 
 
-    print("TABLE NAME ", vid_table_name)
+    print("Creating vid_table_name ", vid_table_name)
     _ = MultimodalLanceDB.from_text_image_pairs(
         texts=updated_vid_subs,
         image_paths=vid_img_path,
@@ -99,7 +99,7 @@ def get_metadata_of_yt_video_with_captions(vid_url):
     print("Checking db and Table name ", vid_table_name)
     if not check_if_table_exists(vid_table_name):
         print("Table does not exists Storing in RAG")
-        vid_table_name= store_in_rag(parent_dir_name, vid_metadata_path)
+        store_in_rag(vid_table_name, vid_metadata_path)
     
     return vid_filepath, vid_table_name
 

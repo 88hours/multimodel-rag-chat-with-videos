@@ -17,6 +17,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import WebVTTFormatter
 from predictionguard import PredictionGuard
 import cv2
+import re
 import json
 import PIL
 from ollama import chat
@@ -99,11 +100,12 @@ def download_video(video_url, path):
         pbar.update(len(data_chunk))
     
     yt = YouTube(video_url, on_progress_callback=progress_callback)
-    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='320p').desc().first()
+    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='480p').desc().first()
     if stream is None:
         stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
 
-    filename = stream.default_filename.replace(' ', '').lower()
+    uncleaned_filename = stream.default_filename.replace(' ', '').lower()
+    filename= re.sub(r'[^a-zA-Z0-9]', '', uncleaned_filename)
     filename_without_extension = os.path.splitext(filename)[0]
 
     folder_path = os.path.join(path, filename_without_extension)
