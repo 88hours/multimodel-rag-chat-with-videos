@@ -101,7 +101,7 @@ def get_metadata_of_yt_video_with_captions(vid_url):
         print("Table does not exists Storing in RAG")
         vid_table_name= store_in_rag(parent_dir_name, vid_metadata_path)
     
-    return vid_filepath
+    return vid_filepath, vid_table_name
 
 """ 
 def chat_response_llvm(instruction):
@@ -116,11 +116,10 @@ def chat_response_llvm(instruction):
     return result
      """
 
-def return_top_k_most_similar_docs(vid_metadata_path, query="show me a group of astronauts", max_docs=1):
+def return_top_k_most_similar_docs(vid_table_name, query="show me a group of astronauts", max_docs=1):
     # ask to return top 3 most similar documents
         # Creating a LanceDB vector store 
-    parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
-    vid_table_name = f"{parent_dir_name}_table"
+    print("Querying ", vid_table_name)  
     vectorstore = MultimodalLanceDB(
         uri=LANCEDB_HOST_FILE, 
         embedding=embedder, 
@@ -142,13 +141,13 @@ def return_top_k_most_similar_docs(vid_metadata_path, query="show me a group of 
 
 
 def process_url_and_init(youtube_url):
-    vid_filepath = get_metadata_of_yt_video_with_captions(youtube_url)
-    return vid_filepath
+    vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(youtube_url)
+    return vid_filepath, vid_table_name
 
 def init_ui():
     with gr.Blocks() as demo:
         url_input = gr.Textbox(label="Enter YouTube URL", value="https://www.youtube.com/watch?v=7Hcg-rLYwdM", interactive=True)
-        print(url_input)
+        vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         submit_btn = gr.Button("Process Video")
         #vid_filepath = 'shared_data/videos/yt_video/Welcome_back_to_Planet_Earth.mp4'
         chatbox = gr.Textbox(label="What question do you want to ask?", value="show me a group of astronauts")
@@ -157,8 +156,8 @@ def init_ui():
         frame = gr.Image()
         submit_btn2 = gr.Button("ASK")
         
-        submit_btn.click(fn=process_url_and_init, inputs=url_input, outputs=[video])
-        submit_btn2.click(fn=return_top_k_most_similar_docs, inputs=[chatbox], outputs=[response, frame])        
+        submit_btn.click(fn=process_url_and_init, inputs=url_input, outputs=[video, vid_table_name])
+        submit_btn2.click(fn=return_top_k_most_similar_docs, inputs=[vid_table_name, chatbox], outputs=[response, frame])        
     return demo
 
 if __name__ == '__main__':
