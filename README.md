@@ -4,6 +4,14 @@ app_file: main_demo.py
 sdk: gradio
 sdk_version: 5.17.1
 ---
+
+# Demo
+## Sample Vide
+    - https://www.youtube.com/watch?v=kOEDG3j1bjs
+    - https://www.youtube.com/watch?v=7Hcg-rLYwdM
+## Questions
+    - Event Horizon 
+    - show me a group of astronauts, AStronaut name 
 # ReArchitecture Multimodal RAG System Pipeline Journey
 I ported it locally and isolated each concept into a step as Python runnable
 It is simplified, refactored and bug-fixed now.
@@ -69,7 +77,7 @@ Developed in collaboration with Intel, this model maps image-caption pairs into 
 
 ### **Case 1: WEBVTT → Extracting Text Segments from Video**  
     - Converts video + text into structured metadata.  
-    - Splits content into multiple segments.  
+    - Splits content inhttps://www.youtube.com/watch?v=kOEDG3j1bjsto multiple segments.  
 
 ### **Case 2: Whisper (Small) → Video Only**  
     - Extracts **audio** → `model.transcribe()`.  

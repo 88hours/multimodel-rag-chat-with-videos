@@ -162,7 +162,7 @@ def init_ui():
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         video = gr.Video()
         submit_btn = gr.Button("Process Video")
-        chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input',  visible=False, value="show me a group of astronauts")
+        chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input',  visible=False, value="")
         response = gr.Textbox(label="Response", elem_id='chat-response',  visible=False,interactive=False)
         frame = gr.Image(visible=False, elem_id='chat-frame', interactive=False)
         submit_btn2 = gr.Button("ASK", elem_id='chat-submit',  visible=False)
