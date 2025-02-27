@@ -61,29 +61,36 @@ def store_in_rag(vid_metadata_path):
     # to add more entries to the vector store
     # in case you want to start with a fresh vector store,
     # you can pass in mode="overwrite" instead 
-    print(os.path.dirname(vid_metadata_path))
 
     parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
-    print(parent_dir_name)
 
-    table_name = os.path.dirname(parent_dir_name)
+    vid_table_name = os.path.dirname(parent_dir_name)
+    vid_table_name = f"{vid_table_name}_table"
+    print("TABLE NAME ", vid_table_name)
     _ = MultimodalLanceDB.from_text_image_pairs(
         texts=updated_vid_subs,
         image_paths=vid_img_path,
         embedding=embedder,
         metadatas=vid_metadata,
         connection=db,
-        table_name=table_name,
+        table_name=vid_table_name,
         mode="overwrite", 
     )
 
 def get_metadata_of_yt_video_with_captions(vid_url):  
-    vid_filepath, vid_folder_path = download_video(vid_url, base_dir)
+    vid_filepath, vid_folder_path, is_downloaded = download_video(vid_url, base_dir)
+    if not is_downloaded:
+        print("Video found at ", vid_filepath)
+        return vid_filepath
+    
+    print("Video not found and downloading transcript")
     vid_transcript_filepath = get_transcript_vtt(vid_folder_path, vid_url, vid_filepath)
+    print("Video not found and extracting")
     extract_meta_data(vid_folder_path, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
-    vid_metadata_path = f"{vid_folder_path}/metadatas.json"
-    store_in_rag(vid_metadata_path)
-    open_table()
+    #vid_metadata_path = f"{vid_folder_path}/metadatas.json"
+    #
+    # store_in_rag(vid_metadata_path)
+    #open_table()
     return vid_filepath
 
 """ 

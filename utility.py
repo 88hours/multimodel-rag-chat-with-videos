@@ -107,21 +107,25 @@ def download_video(video_url, path):
     filename_without_extension = os.path.splitext(filename)[0]
 
     folder_path = os.path.join(path, filename_without_extension)
+    print(f'Checking the folder path {folder_path}')
+
     if not os.path.exists(folder_path):
         os.makedirs(folder_path, exist_ok=True)
 
     filepath = os.path.join(folder_path, filename)
+    is_downloaded = False
     print(f'Checking if video already downloaded at {filepath}')
     if os.path.exists(filepath):   
         print('Video already downloaded')
-        return filepath[0], folder_path
+        return filepath, folder_path, is_downloaded
     
+    is_downloaded = True
     if not os.path.exists(filepath):   
         print('Downloading video from YouTube...')
         pbar = tqdm(desc='Downloading video from YouTube', total=stream.filesize, unit="bytes")
         stream.download(folder_path, filename=filename)
         pbar.close()
-    return filepath, folder_path
+    return filepath, folder_path, is_downloaded
 
 def get_video_id_from_url(video_url):
     """
