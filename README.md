@@ -1,6 +1,6 @@
 ---
 title: multimodel-rag-chat-with-videos
-app_file: main_demo.py
+app_file: app.py
 sdk: gradio
 sdk_version: 5.17.1
 ---
@@ -171,18 +171,4 @@ _ = MultimodalLanceDB.from_text_image_pairs(
     Data pipeline construction
     Vector store implementation
     Multimodal system integration
-## Hugging Face
-Remote: hf_origin
-branch:hf_main
-title: Hg Demo
-emoji: 😻
-colorFrom: gray
-colorTo: red
-sdk: gradio
-sdk_version: 5.18.0
-app_file: app.py
-pinned: false
-license: mit
-short_description: 'A space to keep AI work for demo '
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
