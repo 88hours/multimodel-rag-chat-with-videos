@@ -142,19 +142,20 @@ def return_top_k_most_similar_docs(vid_table_name, query="show me a group of ast
 
 def process_url_and_init(youtube_url):
     vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(youtube_url)
+    gr.Textbox(elem_id='url-inp',visible=False)
     return vid_filepath, vid_table_name
 
 def init_ui():
     with gr.Blocks() as demo:
-        url_input = gr.Textbox(label="Enter YouTube URL", value="https://www.youtube.com/watch?v=7Hcg-rLYwdM", interactive=True)
+        url_input = gr.Textbox(label="Enter YouTube URL", elem_id='url-inp',value="https://www.youtube.com/watch?v=7Hcg-rLYwdM", interactive=True)
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
+        video = gr.Video()
         submit_btn = gr.Button("Process Video")
         #vid_filepath = 'shared_data/videos/yt_video/Welcome_back_to_Planet_Earth.mp4'
-        chatbox = gr.Textbox(label="What question do you want to ask?", value="show me a group of astronauts")
-        response = gr.Textbox(label="Response", interactive=False)
-        video = gr.Video()
-        frame = gr.Image()
-        submit_btn2 = gr.Button("ASK")
+        chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input',  visible=False, value="show me a group of astronauts")
+        response = gr.Textbox(label="Response", elem_id='chat-response',  visible=False,interactive=False)
+        frame = gr.Image(visible=False, elem_id='chat-frame', interactive=False)
+        submit_btn2 = gr.Button("ASK", elem_id='chat-submit',  visible=False)
         
         submit_btn.click(fn=process_url_and_init, inputs=url_input, outputs=[video, vid_table_name])
         submit_btn2.click(fn=return_top_k_most_similar_docs, inputs=[vid_table_name, chatbox], outputs=[response, frame])        
