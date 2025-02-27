@@ -35,7 +35,10 @@ def open_table(table_name):
     # display the first 3 rows of the table
     tbl.to_pandas()[['text', 'image_path']].head(3)
 
-def store_in_rag(vid_metadata_path):
+def check_if_table_exists(table_name):
+    return table_name in db.table_names()
+
+def store_in_rag(vid_table_name, vid_metadata_path):
 
     # load metadata files
     
@@ -62,9 +65,7 @@ def store_in_rag(vid_metadata_path):
     # in case you want to start with a fresh vector store,
     # you can pass in mode="overwrite" instead 
 
-    parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
 
-    vid_table_name = f"{parent_dir_name}_table"
     print("TABLE NAME ", vid_table_name)
     _ = MultimodalLanceDB.from_text_image_pairs(
         texts=updated_vid_subs,
@@ -75,6 +76,8 @@ def store_in_rag(vid_metadata_path):
         table_name=vid_table_name,
         mode="overwrite", 
     )
+    open_table(vid_table_name)
+
     return vid_table_name
 
 def get_metadata_of_yt_video_with_captions(vid_url):  
@@ -88,12 +91,16 @@ def get_metadata_of_yt_video_with_captions(vid_url):
     print("checking metadatas at", vid_metadata_path)
     if os.path.exists(vid_metadata_path):
         print('Metadatas already exists')
-    else
+    else:
         extract_meta_data(vid_folder_path, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
     
-    vid_table_name= store_in_rag(vid_metadata_path)
-    print("Table name ", vid_table_name)
-    open_table(vid_table_name)
+    parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
+    vid_table_name = f"{parent_dir_name}_table"
+    print("Checking db and Table name ", vid_table_name)
+    if not check_if_table_exists(vid_table_name):
+        print("Table does not exists Storing in RAG")
+        vid_table_name= store_in_rag(parent_dir_name, vid_metadata_path)
+    
     return vid_filepath
 
 """ 
@@ -112,11 +119,12 @@ def chat_response_llvm(instruction):
 def return_top_k_most_similar_docs(vid_metadata_path, query="show me a group of astronauts", max_docs=1):
     # ask to return top 3 most similar documents
         # Creating a LanceDB vector store 
-    table_name = os.path.dirname(vid_metadata_path)
+    parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
+    vid_table_name = f"{parent_dir_name}_table"
     vectorstore = MultimodalLanceDB(
         uri=LANCEDB_HOST_FILE, 
         embedding=embedder, 
-        table_name=table_name)
+        table_name=vid_table_name)
 
     # creating a retriever for the vector store
     # search_type="similarity" 
