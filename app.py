@@ -176,7 +176,7 @@ def process_url_and_init(youtube_url, from_gen=False):
 
 def init_ui():
     with gr.Blocks() as demo:
-        gr.Markdown("Welcome to video chat demo - Initial processing can take up to 2 minutes, and responses may be slow. Please be patient and avoid clicking repeatedly.")
+        gr.Markdown("Welcome to video chat demo - Initial processing can take up to 2 minutes, and responses may be slow. Kindly be patient and avoid clicking repeatedly.")
         url_input = gr.Textbox(label="Enter YouTube URL", visible=False, elem_id='url-inp',value="https://www.youtube.com/watch?v=kOEDG3j1bjs", interactive=True)
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         video = gr.Video()
