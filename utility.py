@@ -107,27 +107,23 @@ def download_video(video_url, path):
     except Exception as e:
         print(f"Youtube Exception Occured.Loading from local resource: {e}")
 
-    uncleaned_filename = stream.default_filename.replace(' ', '').lower() if stream else "blackholes101nationalgeographicmp4.mp4"
-    filename= re.sub(r'[^a-zA-Z0-9]', '', uncleaned_filename)
+    uncleaned_filename = stream.default_filename.replace(' ', '').lower() if stream else "blackholes101nationalgeographic.mp4"
+    print(f'Uncleaned filename: {uncleaned_filename}')
+    filename= re.sub(r'[^a-zA-Z0-9]', '', uncleaned_filename).replace('mp4', '')
     filename_without_extension = os.path.splitext(filename)[0]
     filename_with_extension = filename+'.mp4'
     folder_path = os.path.join(path, filename_without_extension)
     print(f'Checking the folder path {folder_path}')
+    full_file_path = os.path.join(folder_path, filename_with_extension)
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path, exist_ok=True)
-
-    full_folder_path = os.path.join(folder_path, filename)
-
     
-    full_file_path = os.path.join(folder_path, filename_with_extension)
-
-    
-    is_downloaded = False
-    print(f'Checking if video already downloaded at {full_folder_path}')
-    if os.path.exists(full_folder_path):   
-        print('Video already downloaded')
+    if os.path.exists(full_file_path):
+        print('Video already downloaded at the folder path', full_file_path)
+        is_downloaded = False
         return full_file_path, folder_path, is_downloaded
+
     
     is_downloaded = True
 
