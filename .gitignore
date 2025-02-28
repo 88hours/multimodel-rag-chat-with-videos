@@ -1,6 +1,5 @@
 myenv
 __pycache__
-shared_data
 .gradio
 .env
 .venv
