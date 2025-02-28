@@ -99,12 +99,15 @@ def download_video(video_url, path):
     def progress_callback(stream: Stream, data_chunk: bytes, bytes_remaining: int) -> None:
         pbar.update(len(data_chunk))
     
-    yt = YouTube(video_url, on_progress_callback=progress_callback)
-    stream = yt.streams.filter(progressive=True, file_extension='mp4', res='480p').desc().first()
-    if stream is None:
-        stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+    try:
+        yt = YouTube(video_url, on_progress_callback=progress_callback)
+        stream = yt.streams.filter(progressive=True, file_extension='mp4', res='480p').desc().first()
+        if stream is None:
+            stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+    except Exception as e:
+        print(f"Youtube Exception Occured.Loading from local resource: {e}")
 
-    uncleaned_filename = stream.default_filename.replace(' ', '').lower()
+    uncleaned_filename = stream.default_filename.replace(' ', '').lower() if stream else "blackholes101nationalgeographicmp4.mp4"
     filename= re.sub(r'[^a-zA-Z0-9]', '', uncleaned_filename)
     filename_without_extension = os.path.splitext(filename)[0]
     filename_with_extension = filename+'.mp4'
