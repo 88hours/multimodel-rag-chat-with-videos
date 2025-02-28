@@ -98,7 +98,7 @@ def download_video(video_url, path):
 
     def progress_callback(stream: Stream, data_chunk: bytes, bytes_remaining: int) -> None:
         pbar.update(len(data_chunk))
-    
+    stream = None
     try:
         yt = YouTube(video_url, on_progress_callback=progress_callback)
         stream = yt.streams.filter(progressive=True, file_extension='mp4', res='480p').desc().first()
