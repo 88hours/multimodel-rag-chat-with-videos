@@ -80,13 +80,13 @@ def store_in_rag(vid_table_name, vid_metadata_path):
 
     return vid_table_name
 
-def get_metadata_of_yt_video_with_captions(vid_url):  
+def get_metadata_of_yt_video_with_captions(vid_url, from_gen=False):  
     vid_filepath, vid_folder_path, is_downloaded = download_video(vid_url, base_dir)
     if is_downloaded:
         print("Video downloaded at ", vid_filepath)
     
     print("checking transcript")
-    vid_transcript_filepath = get_transcript_vtt(vid_folder_path, vid_url, vid_filepath)
+    vid_transcript_filepath = get_transcript_vtt(vid_folder_path, vid_url, vid_filepath, from_gen)
     vid_metadata_path = f"{vid_folder_path}/metadatas.json"
     print("checking metadatas at", vid_metadata_path)
     if os.path.exists(vid_metadata_path):
@@ -147,14 +147,14 @@ def return_top_k_most_similar_docs(vid_table_name, query="show me a group of ast
     return page_content, image1, image2
 
 
-def process_url_and_init(youtube_url):
+def process_url_and_init(youtube_url, from_gen=False):
     url_input = gr.update(visible=False)
-    submit_btn = gr.update(visible=False)
+    submit_btn = gr.update(visible=True)
     chatbox = gr.update(visible=True)
     submit_btn2 = gr.update(visible=True)
     frame1 = gr.update(visible=True)
     frame2 = gr.update(visible=False)
-    vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(youtube_url)
+    vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(youtube_url, from_gen)
     video = gr.Video(vid_filepath,render=True)
     return url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2
 
@@ -163,7 +163,10 @@ def init_ui():
         url_input = gr.Textbox(label="Enter YouTube URL", visible=False, elem_id='url-inp',value="https://www.youtube.com/watch?v=kOEDG3j1bjs", interactive=True)
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         video = gr.Video()
-        submit_btn = gr.Button("Load & Process Video")
+        with gr.Row():
+            submit_btn = gr.Button("Process Video By Download Subtitles")
+            submit_btn_gen = gr.Button("Process Video By Generating Audio & Subtitles")
+
         with gr.Row():
             chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input', visible=False, value="what this video is about?", scale=4)
             submit_btn2 = gr.Button("ASK", elem_id='chat-submit', visible=False, scale=1)
@@ -173,6 +176,7 @@ def init_ui():
             frame1 = gr.Image(visible=False, interactive=False, scale=2)
             frame2 = gr.Image(visible=False, interactive=False, scale=2)
         submit_btn.click(fn=process_url_and_init, inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2])
+        submit_btn_gen.click(fn=lambda x: process_url_and_init(x, from_gen=True), inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2])
         submit_btn2.click(fn=return_top_k_most_similar_docs, inputs=[vid_table_name, chatbox], outputs=[response, frame1, frame2])        
         reset_btn = gr.Button("Reload Page")
         reset_btn.click(None, js="() => { location.reload(); }")

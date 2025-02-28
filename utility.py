@@ -9,10 +9,12 @@ from typing import Iterator, TextIO, List, Dict, Any, Optional, Sequence, Union
 from enum import auto, Enum
 import base64
 import glob
+from moviepy import VideoFileClip
 import requests
 from tqdm import tqdm
 from pytubefix import YouTube, Stream
 import webvtt
+import whisper
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import WebVTTFormatter
 from predictionguard import PredictionGuard
@@ -155,9 +157,35 @@ def get_video_id_from_url(video_url):
             return url.path.split('/')[2]
 
     return video_url
-    
+
+def generate_transcript_vtt(vid_dir, vid_filepath):
+    print("Generating transcript for video ", vid_filepath)
+     # declare where to save .mp3 audio
+    path_to_extracted_audio_file = os.path.join(vid_dir, 'audio.mp3')
+
+    # extract mp3 audio file from mp4 video video file
+    path_to_video_no_transcript = vid_filepath
+    clip = VideoFileClip(path_to_video_no_transcript)
+    clip.audio.write_audiofile(path_to_extracted_audio_file)
+
+    model = whisper.load_model("small")
+    options = dict(task="translate", best_of=1, language='en')
+    results = model.transcribe(path_to_extracted_audio_file, **options)
+
+    vtt = getSubs(results["segments"], "vtt")
+
+    # path to save generated transcript of video1
+    path_to_generated_trans = osp.join(vid_dir, 'captions.vtt')
+    # write transcription to file
+    with open(path_to_generated_trans, 'w') as f:
+        f.write(vtt)
+    return path_to_generated_trans
+
+
 # if this has transcript then download
-def get_transcript_vtt(path, video_url, vid_filepath):
+def get_transcript_vtt(path, video_url, vid_file_path, from_gen=False):
+    if from_gen:
+        return generate_transcript_vtt(path,vid_file_path)
     video_id = get_video_id_from_url(video_url)
     filepath = os.path.join(path,'captions.vtt')
     if os.path.exists(filepath):
