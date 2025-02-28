@@ -117,7 +117,7 @@ def chat_response_llvm(instruction):
     return result
      """
 
-def return_top_k_most_similar_docs(vid_table_name, query="show me a group of astronauts", max_docs=1):
+def return_top_k_most_similar_docs(vid_table_name, query="show me a group of astronauts", max_docs=5):
     # ask to return top 3 most similar documents
         # Creating a LanceDB vector store 
     print("Querying ", vid_table_name)  
@@ -126,12 +126,6 @@ def return_top_k_most_similar_docs(vid_table_name, query="show me a group of ast
         embedding=embedder, 
         table_name=vid_table_name)
 
-    # creating a retriever for the vector store
-    # search_type="similarity" 
-    #  declares that the type of search that the Retriever should perform 
-    #  is similarity search
-    # search_kwargs={"k": 1} means returning top-1 most similar document
-    
     
     retriever = vectorstore.as_retriever(
     search_type='similarity', 
@@ -139,13 +133,18 @@ def return_top_k_most_similar_docs(vid_table_name, query="show me a group of ast
     
     results = retriever.invoke(query)
     # Store results in variables
-    page_content = results[0].page_content
-    page_content_visibility = gr.update(visible=True)
-    image = Image.open(results[0].metadata['extracted_frame_path'])
-    image_visibility = gr.update(visible=True)
+    all_page_content = max([result.page_content for result in results], key=len)
+    page_content = gr.Textbox(all_page_content, label="Response", elem_id='chat-response',  visible=True, interactive=False)
+    image1 = Image.open(results[0].metadata['extracted_frame_path'])
+    image2_path = results[1].metadata['extracted_frame_path']
     
+    if results[0].metadata['extracted_frame_path'] == image2_path:
+        image2 = gr.update(visible=False)
+    else:
+        image2 = Image.open(image2_path)
+        image2 = gr.update(value=image2, visible=True)
     # Return the variables
-    return page_content, page_content_visibility, image, image_visibility
+    return page_content, image1, image2
 
 
 def process_url_and_init(youtube_url):
@@ -153,9 +152,11 @@ def process_url_and_init(youtube_url):
     submit_btn = gr.update(visible=False)
     chatbox = gr.update(visible=True)
     submit_btn2 = gr.update(visible=True)
+    frame1 = gr.update(visible=True)
+    frame2 = gr.update(visible=False)
     vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(youtube_url)
     video = gr.Video(vid_filepath,render=True)
-    return url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2
+    return url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2
 
 def init_ui():
     with gr.Blocks() as demo:
@@ -163,19 +164,20 @@ def init_ui():
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         video = gr.Video()
         submit_btn = gr.Button("Load & Process Video")
-        chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input',  visible=False, value="what this video is about?")
+        with gr.Row():
+            chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input', visible=False, value="what this video is about?", scale=4)
+            submit_btn2 = gr.Button("ASK", elem_id='chat-submit', visible=False, scale=1)
         response = gr.Textbox(label="Response", elem_id='chat-response',  visible=False,interactive=False)
         
-        frame = gr.Image(visible=False, elem_id='chat-frame', interactive=False)
-        submit_btn2 = gr.Button("ASK", elem_id='chat-submit',  visible=False)
-        
-        submit_btn.click(fn=process_url_and_init, inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2])
-        submit_btn2.click(fn=return_top_k_most_similar_docs, inputs=[vid_table_name, chatbox], outputs=[response, response, frame, frame])        
+        with gr.Row():
+            frame1 = gr.Image(visible=False, interactive=False, scale=2)
+            frame2 = gr.Image(visible=False, interactive=False, scale=2)
+        submit_btn.click(fn=process_url_and_init, inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2])
+        submit_btn2.click(fn=return_top_k_most_similar_docs, inputs=[vid_table_name, chatbox], outputs=[response, frame1, frame2])        
         reset_btn = gr.Button("Reload Page")
         reset_btn.click(None, js="() => { location.reload(); }")
     return demo
 
 if __name__ == '__main__':
     demo = init_ui()
-    demo.launch(True)
-    
+    demo.launch(share=True, debug=True)    
