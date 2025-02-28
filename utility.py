@@ -107,27 +107,32 @@ def download_video(video_url, path):
     uncleaned_filename = stream.default_filename.replace(' ', '').lower()
     filename= re.sub(r'[^a-zA-Z0-9]', '', uncleaned_filename)
     filename_without_extension = os.path.splitext(filename)[0]
-
+    filename_with_extension = filename+'.mp4'
     folder_path = os.path.join(path, filename_without_extension)
     print(f'Checking the folder path {folder_path}')
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path, exist_ok=True)
 
-    filepath = os.path.join(folder_path, filename)
+    full_folder_path = os.path.join(folder_path, filename)
+
+    
+    full_file_path = os.path.join(folder_path, filename_with_extension)
+
+    
     is_downloaded = False
-    print(f'Checking if video already downloaded at {filepath}')
-    if os.path.exists(filepath):   
+    print(f'Checking if video already downloaded at {full_folder_path}')
+    if os.path.exists(full_folder_path):   
         print('Video already downloaded')
-        return filepath, folder_path, is_downloaded
+        return full_file_path, folder_path, is_downloaded
     
     is_downloaded = True
-    if not os.path.exists(filepath):   
-        print('Downloading video from YouTube...')
-        pbar = tqdm(desc='Downloading video from YouTube', total=stream.filesize, unit="bytes")
-        stream.download(folder_path, filename=filename)
-        pbar.close()
-    return filepath, folder_path, is_downloaded
+
+    print('Downloading video from YouTube...')
+    pbar = tqdm(desc='Downloading video from YouTube', total=stream.filesize, unit="bytes")
+    stream.download(folder_path, filename=filename_with_extension)
+    pbar.close()
+    return full_file_path, folder_path, is_downloaded
 
 def get_video_id_from_url(video_url):
     """
@@ -159,6 +164,8 @@ def get_transcript_vtt(path, video_url, vid_filepath):
     if os.path.exists(filepath):
         print('Transcript already exists')
         return filepath
+    
+    print('Downloading Transcript...')
 
     transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en-GB', 'en'])
     formatter = WebVTTFormatter()
@@ -575,8 +582,10 @@ def extract_and_save_frames_and_metadata(
     metadatas = []
 
     # load video using cv2
+    print(f"Loading video from {path_to_video}")
     video = cv2.VideoCapture(path_to_video)
     # load transcript using webvtt
+    print(f"Loading transcript from {path_to_transcript}")
     trans = webvtt.read(path_to_transcript)
     
     # iterate transcript file
@@ -592,6 +601,7 @@ def extract_and_save_frames_and_metadata(
         text = transcript.text.replace("\n", ' ')
         # get frame at the middle time
         video.set(cv2.CAP_PROP_POS_MSEC, mid_time_ms)
+        print(f"Extracting frame at {mid_time_ms} ms")
         success, frame = video.read()
         if success:
             # if the frame is extracted successfully, resize it
@@ -628,8 +638,10 @@ def extract_meta_data(vid_dir, vid_filepath, vid_transcript_filepath):
     metadatas_path = vid_dir
 
     # create these output folders if not existing
+    print(f"Creating folders {extracted_frames_path} and {metadatas_path}")
     Path(extracted_frames_path).mkdir(parents=True, exist_ok=True)
     Path(metadatas_path).mkdir(parents=True, exist_ok=True)
+    print("Extracting frames the video path ", vid_filepath)
 
     # call the function to extract frames and metadatas
     metadatas = extract_and_save_frames_and_metadata(

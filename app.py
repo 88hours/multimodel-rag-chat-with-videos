@@ -92,6 +92,7 @@ def get_metadata_of_yt_video_with_captions(vid_url):
     if os.path.exists(vid_metadata_path):
         print('Metadatas already exists')
     else:
+        print("Downloading metadatas for the video ", vid_filepath)
         extract_meta_data(vid_folder_path, vid_filepath, vid_transcript_filepath) #should return lowercase file name without spaces
     
     parent_dir_name = os.path.basename(os.path.dirname(vid_metadata_path))
