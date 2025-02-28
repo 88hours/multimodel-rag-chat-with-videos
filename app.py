@@ -84,7 +84,17 @@ def get_metadata_of_yt_video_with_captions(vid_url, from_gen=False):
     vid_filepath, vid_folder_path, is_downloaded = download_video(vid_url, base_dir)
     if is_downloaded:
         print("Video downloaded at ", vid_filepath)
-    
+    if from_gen:
+        # Delete existing caption and metadata files if they exist
+        caption_file = f"{vid_folder_path}/captions.vtt"
+        metadata_file = f"{vid_folder_path}/metadatas.json"
+        if os.path.exists(caption_file):
+            os.remove(caption_file)
+            print(f"Deleted existing caption file: {caption_file}")
+        if os.path.exists(metadata_file):
+            os.remove(metadata_file)
+            print(f"Deleted existing metadata file: {metadata_file}")
+
     print("checking transcript")
     vid_transcript_filepath = get_transcript_vtt(vid_folder_path, vid_url, vid_filepath, from_gen)
     vid_metadata_path = f"{vid_folder_path}/metadatas.json"
@@ -100,8 +110,14 @@ def get_metadata_of_yt_video_with_captions(vid_url, from_gen=False):
     print("Checking db and Table name ", vid_table_name)
     if not check_if_table_exists(vid_table_name):
         print("Table does not exists Storing in RAG")
-        store_in_rag(vid_table_name, vid_metadata_path)
-    
+    else:
+        print("Table exists")
+        def delete_table(table_name):
+            db.drop_table(table_name)
+            print(f"Deleted table {table_name}")
+        delete_table(vid_table_name)
+
+    store_in_rag(vid_table_name, vid_metadata_path)
     return vid_filepath, vid_table_name
 
 """ 
@@ -160,6 +176,7 @@ def process_url_and_init(youtube_url, from_gen=False):
 
 def init_ui():
     with gr.Blocks() as demo:
+        gr.Markdown("Welcome to video chat demo - Initial processing can take up to 2 minutes, and responses may be slow. Please be patient and avoid clicking repeatedly.")
         url_input = gr.Textbox(label="Enter YouTube URL", visible=False, elem_id='url-inp',value="https://www.youtube.com/watch?v=kOEDG3j1bjs", interactive=True)
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         video = gr.Video()
