@@ -4,5 +4,5 @@ __pycache__
 .env
 .venv
 .github
-shared_data/.lancedb
+shared_data/.lancedb/
 shared_data/videos/yt_video/blackholes101nationalgeographic/audio.mp3

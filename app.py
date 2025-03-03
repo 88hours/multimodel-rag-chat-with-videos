@@ -133,7 +133,8 @@ def chat_response_llvm(instruction):
     return result
      """
 
-def return_top_k_most_similar_docs(vid_table_name, query, max_docs=2, use_llm=False, caption_file_path=None):
+def return_top_k_most_similar_docs(vid_table_name, query, use_llm=False):
+    max_docs=2
     # ask to return top 3 most similar documents
         # Creating a LanceDB vector store 
     print("Querying ", vid_table_name)  
@@ -155,16 +156,15 @@ def return_top_k_most_similar_docs(vid_table_name, query, max_docs=2, use_llm=Fa
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 return content
-        captions = read_vtt_file(caption_file_path)
+        vid_table_name = vid_table_name.split('_table')[0]
+        caption_file = 'shared_data/videos/yt_video/' + vid_table_name + '/captions.vtt'
+        print("Caption file path ", caption_file)
+        captions = read_vtt_file(caption_file)
         prompt = "Answer this query : " + query + " from the content " + captions
-        
-        # Get folder path from results metadata and read captions
-        video_folder = os.path.dirname(results[0].metadata['extracted_frame_path'])
-        captions_path = os.path.join(video_folder, 'captions.vtt')
-        captions_content = read_vtt_file(captions_path)
-        
+        print("Prompt ", prompt)
+               
         # Combine captions with prompt for LLM
-        all_page_content = lvlm_inference_with_ollama(prompt + captions_content)
+        all_page_content = lvlm_inference_with_ollama(prompt)
     else:
         all_page_content = "\n\n".join([result.page_content for result in results])
 
@@ -188,19 +188,21 @@ def process_url_and_init(youtube_url, from_gen=False):
     submit_btn2 = gr.update(visible=True)
     frame1 = gr.update(visible=True)
     frame2 = gr.update(visible=False)
+    chatbox_llm, submit_btn_chat = gr.update(visible=True), gr.update(visible=True)
     vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(youtube_url, from_gen)
     video = gr.Video(vid_filepath,render=True)
-    return url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2
+    return url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2, chatbox_llm, submit_btn_chat
 
 def init_ui():
     with gr.Blocks() as demo:
+
         gr.Markdown("Welcome to video chat demo - Initial processing can take up to 2 minutes, and responses may be slow. Please be patient and avoid clicking repeatedly.")
         url_input = gr.Textbox(label="Enter YouTube URL", visible=False, elem_id='url-inp',value="https://www.youtube.com/watch?v=kOEDG3j1bjs", interactive=True)
         vid_table_name = gr.Textbox(label="Enter Table Name", visible=False, interactive=False)
         video = gr.Video()
         with gr.Row():
             submit_btn = gr.Button("Process Video By Download Subtitles")
-            submit_btn_gen = gr.Button("Process Video By Generating Audio & Subtitles By AI")
+            submit_btn_gen = gr.Button("Process Video By Generating Subtitles")
 
         with gr.Row():
             chatbox = gr.Textbox(label="Enter the keyword/s and AI will get related captions and images", visible=False, value="event horizan", scale=4)
@@ -214,11 +216,19 @@ def init_ui():
         with gr.Row():
             frame1 = gr.Image(visible=False, interactive=False, scale=2)
             frame2 = gr.Image(visible=False, interactive=False, scale=2)
-        submit_btn.click(fn=process_url_and_init, inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn_whisper, frame1, frame2])
-        submit_btn_gen.click(fn=lambda x: process_url_and_init(x, from_gen=True), inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn_whisper, frame1, frame2])
+        submit_btn.click(fn=process_url_and_init, inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn_whisper, frame1, frame2, chatbox_llm, submit_btn_chat])
+        submit_btn_gen.click(fn=lambda x: process_url_and_init(x, from_gen=True), inputs=[url_input], outputs=[url_input, submit_btn, video, vid_table_name, chatbox,submit_btn_whisper, frame1, frame2,chatbox_llm, submit_btn_chat])
         submit_btn_whisper.click(fn=return_top_k_most_similar_docs, inputs=[vid_table_name, chatbox], outputs=[response, frame1, frame2])        
-        caption_file = 'shared_data/videos/yt_video/' + vid_table_name + '/captions.vtt'
-        submit_btn_chat.click(fn=lambda x: return_top_k_most_similar_docs(x, use_llm=True, caption_file_path=caption_file ), inputs=[vid_table_name, chatbox_llm], outputs=[response, frame1, frame2])        
+        
+        submit_btn_chat.click(
+            fn=lambda table_name, query: return_top_k_most_similar_docs(
+                vid_table_name=table_name,
+                query=query,
+                use_llm=True
+            ),
+            inputs=[vid_table_name, chatbox_llm],
+            outputs=[response, frame1, frame2]
+        )     
         reset_btn = gr.Button("Reload Page")
         reset_btn.click(None, js="() => { location.reload(); }")
     return demo

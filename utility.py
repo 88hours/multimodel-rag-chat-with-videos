@@ -572,28 +572,18 @@ def lvlm_inference_with_conversation(conversation, max_tokens: int = 200, temper
     )
     return response['choices'][-1]['message']['content']
 
-def lvlm_inference_with_ollama(conversation, max_tokens: int = 200, temperature: float = 0.95, top_p: float = 0.1, top_k: int = 10):
-
-   
-
-    # Send the request to the local Ollama server
-    #response = requests.post("http://localhost:8000/api/v1/completions", json=payload)
-        
-    stream = chat(
-        model="llava-1.5-7b-hf",
-        messages= conversation,
-        stream=True,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        top_p=top_p,
-        top_k=top_k
+def lvlm_inference_with_ollama(prompt):
+    # Remove temperature or use correct parameters for Ollama client
+    response = chat(
+        model="phi3",  # or your chosen model
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
     )
-
-    response_data = ''
-    for chunk in stream:
-        response_data += chunk['message']['content']
-   
-    return response_data
+    return response['message']['content']
 
 # function `extract_and_save_frames_and_metadata``:
 #   receives as input a video and its transcript
@@ -739,3 +729,7 @@ def extract_and_save_frames_and_metadata_with_fps(
     with open(metadatas_path, 'w') as outfile:
         json.dump(metadatas, outfile)
     return metadatas
+
+if __name__ == "__main__":
+    res = lvlm_inference_with_ollama("Tell me a story")
+    print(res)
