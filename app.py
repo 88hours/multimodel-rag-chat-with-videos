@@ -183,9 +183,10 @@ def init_ui():
         with gr.Row():
             submit_btn = gr.Button("Process Video By Download Subtitles")
             submit_btn_gen = gr.Button("Process Video By Generating Audio & Subtitles By AI")
+            submit_btn_llvm= gr.Button("Process Video By LLvM")
 
         with gr.Row():
-            chatbox = gr.Textbox(label="What question do you want to ask?", elem_id='chat-input', visible=False, value="what this video is about?", scale=4)
+            chatbox = gr.Textbox(label="Enter the keyword/s and AI will get related captions and images", elem_id='chat-input', visible=False, value="what this video is about?", scale=4)
             submit_btn2 = gr.Button("ASK", elem_id='chat-submit', visible=False, scale=1)
         response = gr.Textbox(label="Response", elem_id='chat-response',  visible=False,interactive=False)
         
