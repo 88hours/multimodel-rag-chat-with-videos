@@ -35,10 +35,7 @@ from langchain_core.messages import (
     MessageLikeRepresentation,
 )
 from transformers import pipeline
-<<<<<<< HEAD
-=======
 from huggingface_hub import InferenceClient
->>>>>>> demo2
 
 MultimodalModelInput = Union[PromptValue, str, Sequence[MessageLikeRepresentation], Dict[str, Any]]
 
