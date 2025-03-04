@@ -3,7 +3,7 @@ import gradio as gr
 import os
 from PIL import Image
 import ollama
-from utility import download_video, get_transcript_vtt, extract_meta_data, lvlm_inference_with_tiny_model, lvlm_inference_with_tiny_model
+from utility import download_video, get_transcript_vtt, extract_meta_data, lvlm_inference_with_phi, lvlm_inference_with_tiny_model, lvlm_inference_with_tiny_model
 from mm_rag.embeddings.bridgetower_embeddings import (
     BridgeTowerEmbeddings
 )
@@ -134,41 +134,40 @@ def chat_response_llvm(instruction):
      """
 
 def return_top_k_most_similar_docs(vid_table_name, query, use_llm=False):
-    max_docs=2
-    # ask to return top 3 most similar documents
-        # Creating a LanceDB vector store 
+    # Initialize results variable outside the if condition
+    max_docs = 2
     print("Querying ", vid_table_name)  
     vectorstore = MultimodalLanceDB(
         uri=LANCEDB_HOST_FILE, 
         embedding=embedder, 
-        table_name=vid_table_name)
+        table_name=vid_table_name
+    )
 
-    
     retriever = vectorstore.as_retriever(
-    search_type='similarity', 
-    search_kwargs={"k": max_docs})
-    
+        search_type='similarity', 
+        search_kwargs={"k": max_docs}
+    )
+
+    # Get results first
     results = retriever.invoke(query)
-    # Store results in variables
+
     if use_llm:
         # Read captions.vtt file
         def read_vtt_file(file_path):
             with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                return content
+                return f.read()
+                
         vid_table_name = vid_table_name.split('_table')[0]
         caption_file = 'shared_data/videos/yt_video/' + vid_table_name + '/captions.vtt'
         print("Caption file path ", caption_file)
         captions = read_vtt_file(caption_file)
         prompt = "Answer this query : " + query + " from the content " + captions
         print("Prompt ", prompt)
-               
-        # Combine captions with prompt for LLM
-        all_page_content = lvlm_inference_with_tiny_model(prompt)
+        all_page_content = lvlm_inference_with_phi(prompt)
     else:
         all_page_content = "\n\n".join([result.page_content for result in results])
 
-    page_content = gr.Textbox(all_page_content, label="Response", elem_id='chat-response',  visible=True, interactive=False)
+    page_content = gr.Textbox(all_page_content, label="Response", elem_id='chat-response', visible=True, interactive=False)
     image1 = Image.open(results[0].metadata['extracted_frame_path'])
     image2_path = results[1].metadata['extracted_frame_path']
     
@@ -177,7 +176,7 @@ def return_top_k_most_similar_docs(vid_table_name, query, use_llm=False):
     else:
         image2 = Image.open(image2_path)
         image2 = gr.update(value=image2, visible=True)
-    # Return the variables
+        
     return page_content, image1, image2
 
 
@@ -235,4 +234,4 @@ def init_ui():
 
 if __name__ == '__main__':
     demo = init_ui()
-    demo.launch(share=True, debug=True)    
+    demo.launch(share=True, debug=True)

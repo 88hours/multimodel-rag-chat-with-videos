@@ -609,12 +609,16 @@ def lvlm_inference_with_tiny_model(prompt):
     
     response = classifier(
         prompt,
-        max_length=256,
+        max_new_tokens=512,  # Remove max_length and use only max_new_tokens
         temperature=0.7,
         do_sample=True,
         num_return_sequences=1,
+        truncation=True,     # Add explicit truncation
+        pad_token_id=classifier.tokenizer.eos_token_id,
+        eos_token_id=classifier.tokenizer.eos_token_id,
     )[0]['generated_text']
     
+    # Remove the input prompt from the response and clean up
     return response.replace(prompt, "").strip()
 
 # function `extract_and_save_frames_and_metadata``:
