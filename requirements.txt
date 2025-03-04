@@ -20,3 +20,6 @@ ollama
 opencv-python
 openai-whisper
 huggingface_hub[cli]
+huggingface_hub
+pillow
+accelerate>=0.26.0

@@ -3,7 +3,7 @@ import gradio as gr
 import os
 from PIL import Image
 import ollama
-from utility import download_video, get_transcript_vtt, extract_meta_data, lvlm_inference_with_ollama, lvlm_inference_with_tiny_model
+from utility import download_video, get_transcript_vtt, extract_meta_data, lvlm_inference_with_tiny_model, lvlm_inference_with_tiny_model
 from mm_rag.embeddings.bridgetower_embeddings import (
     BridgeTowerEmbeddings
 )
