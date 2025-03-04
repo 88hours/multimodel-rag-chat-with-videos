@@ -34,6 +34,7 @@ from langchain_core.prompt_values import PromptValue
 from langchain_core.messages import (
     MessageLikeRepresentation,
 )
+from transformers import pipeline
 
 MultimodalModelInput = Union[PromptValue, str, Sequence[MessageLikeRepresentation], Dict[str, Any]]
 
@@ -572,7 +573,7 @@ def lvlm_inference_with_conversation(conversation, max_tokens: int = 200, temper
     )
     return response['choices'][-1]['message']['content']
 
-def lvlm_inference_with_ollama(prompt):
+def lvlm_inference_with_local(prompt):
     # Remove temperature or use correct parameters for Ollama client
     response = chat(
         model="phi3",  # or your chosen model
@@ -584,6 +585,37 @@ def lvlm_inference_with_ollama(prompt):
         ]
     )
     return response['message']['content']
+
+def lvlm_inference_with_phi(prompt):
+
+    response = chat(
+        model="phi3",  # or your chosen model
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+    return response['message']['content']
+
+def lvlm_inference_with_tiny_model(prompt):
+    classifier = pipeline(
+        "text-generation",
+        model="microsoft/phi-2",  # Only ~2.7GB
+        device_map="auto",
+        torch_dtype="auto",
+    )
+    
+    response = classifier(
+        prompt,
+        max_length=256,
+        temperature=0.7,
+        do_sample=True,
+        num_return_sequences=1,
+    )[0]['generated_text']
+    
+    return response.replace(prompt, "").strip()
 
 # function `extract_and_save_frames_and_metadata``:
 #   receives as input a video and its transcript

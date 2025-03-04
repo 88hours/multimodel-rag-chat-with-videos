@@ -3,7 +3,7 @@ import gradio as gr
 import os
 from PIL import Image
 import ollama
-from utility import download_video, get_transcript_vtt, extract_meta_data, lvlm_inference_with_ollama
+from utility import download_video, get_transcript_vtt, extract_meta_data, lvlm_inference_with_ollama, lvlm_inference_with_tiny_model
 from mm_rag.embeddings.bridgetower_embeddings import (
     BridgeTowerEmbeddings
 )
@@ -164,7 +164,7 @@ def return_top_k_most_similar_docs(vid_table_name, query, use_llm=False):
         print("Prompt ", prompt)
                
         # Combine captions with prompt for LLM
-        all_page_content = lvlm_inference_with_ollama(prompt)
+        all_page_content = lvlm_inference_with_tiny_model(prompt)
     else:
         all_page_content = "\n\n".join([result.page_content for result in results])
 
