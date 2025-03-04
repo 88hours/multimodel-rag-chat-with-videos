@@ -1,0 +1,12 @@
+myenv
+__pycache__
+.gradio
+.venv
+.env
+.env.*
+!.env.example
+.github
+# LanceDB files
+shared_data/.lancedb/
+shared_data/.lancedb/**/*
+shared_data/videos/yt_video/blackholes101nationalgeographic/audio.mp3
