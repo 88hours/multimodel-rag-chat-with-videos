@@ -1,8 +1,10 @@
 myenv
 __pycache__
 .gradio
-.env
 .venv
+.env
+.env.*
+!.env.example
 .github
 # LanceDB files
 shared_data/.lancedb/

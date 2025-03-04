@@ -192,6 +192,12 @@ def process_url_and_init(youtube_url, from_gen=False):
     video = gr.Video(vid_filepath,render=True)
     return url_input, submit_btn, video, vid_table_name, chatbox,submit_btn2, frame1, frame2, chatbox_llm, submit_btn_chat
 
+def test_btn():
+    text = "hi"
+    res = lvlm_inference_with_phi(text)
+    response = gr.Textbox(res, visible=True,interactive=False)
+    return response
+
 def init_ui():
     with gr.Blocks() as demo:
 
@@ -230,6 +236,9 @@ def init_ui():
         )     
         reset_btn = gr.Button("Reload Page")
         reset_btn.click(None, js="() => { location.reload(); }")
+
+        test_llama = gr.Button("Test Llama")
+        test_llama.click(test_btn, None, outputs=[response])
     return demo
 
 if __name__ == '__main__':

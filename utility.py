@@ -35,6 +35,10 @@ from langchain_core.messages import (
     MessageLikeRepresentation,
 )
 from transformers import pipeline
+<<<<<<< HEAD
+=======
+from huggingface_hub import InferenceClient
+>>>>>>> demo2
 
 MultimodalModelInput = Union[PromptValue, str, Sequence[MessageLikeRepresentation], Dict[str, Any]]
 
@@ -573,31 +577,35 @@ def lvlm_inference_with_conversation(conversation, max_tokens: int = 200, temper
     )
     return response['choices'][-1]['message']['content']
 
-def lvlm_inference_with_local(prompt):
-    # Remove temperature or use correct parameters for Ollama client
-    response = chat(
-        model="phi3",  # or your chosen model
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
-    return response['message']['content']
 
 def lvlm_inference_with_phi(prompt):
-
-    response = chat(
-        model="phi3",  # or your chosen model
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
+    client = InferenceClient(
+        token=os.getenv("HUGGINGFACE_TOKEN")  # Make sure to set this environment variable
     )
-    return response['message']['content']
+    
+    response = client.text_generation(
+        text=prompt,
+        model="microsoft/phi-2",  # or any other model you prefer
+        max_new_tokens=512,
+        temperature=0.7,
+        do_sample=True,
+        num_return_sequences=1,
+        repetition_penalty=1.1
+    )
+    
+    return response[0]["generated_text"].replace(prompt, "").strip()
+
+def lvlm_inference_with_phi(prompt):
+    client = InferenceClient(
+        token=os.getenv("HUGGINGFACE_TOKEN")  # Make sure to set this environment variable
+    )
+    
+    messages = [{"role": "user", "content": prompt}]
+    client = InferenceClient("meta-llama/Meta-Llama-3-8B-Instruct")
+    response = ''
+    token = client.chat_completion(messages, max_tokens=256)    
+    response = token['choices'][0]['message']['content']
+    return response
 
 def lvlm_inference_with_tiny_model(prompt):
     classifier = pipeline(
@@ -767,5 +775,5 @@ def extract_and_save_frames_and_metadata_with_fps(
     return metadatas
 
 if __name__ == "__main__":
-    res = lvlm_inference_with_ollama("Tell me a story")
+    res = lvlm_inference_with_phi("Tell me a story")
     print(res)
