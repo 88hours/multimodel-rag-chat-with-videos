@@ -576,7 +576,6 @@ def lvlm_inference_with_conversation(conversation, max_tokens: int = 200, temper
 
 def get_token():
     token = os.getenv("HUGGINGFACE_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
-    print(f"Token: {token}")
     if token is None:
         raise ValueError("HUGGINGFACE_TOKEN not found in environment variables")
     return token
