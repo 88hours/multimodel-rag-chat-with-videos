@@ -583,12 +583,10 @@ def get_token():
 
 
 def lvlm_inference_with_phi(prompt):
-    client = InferenceClient(
-        token=get_token()
-    )
+   
     
     messages = [{"role": "user", "content": prompt}]
-    client = InferenceClient("meta-llama/Meta-Llama-3-8B-Instruct")
+    client = InferenceClient("meta-llama/Meta-Llama-3-8B-Instruct", token=get_token())
     response = ''
     token = client.chat_completion(messages, max_tokens=256)    
     response = token['choices'][0]['message']['content']
