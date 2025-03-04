@@ -21,7 +21,15 @@ I migrated from Prediction Guard to HuggingFace.
 
 ### A multimodal AI system should be able to understand both text and video content.  
 
----
+## Setup
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+For Fish
+```bash
+source venv/bin/activate.fish
+```
 
 ## Step 1 - Learn Gradio (UI) (30 mins)  
 

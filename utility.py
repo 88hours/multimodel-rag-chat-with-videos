@@ -574,27 +574,17 @@ def lvlm_inference_with_conversation(conversation, max_tokens: int = 200, temper
     )
     return response['choices'][-1]['message']['content']
 
+def get_token():
+    token = os.getenv("HUGGINGFACE_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
+    print(f"Token: {token}")
+    if token is None:
+        raise ValueError("HUGGINGFACE_TOKEN not found in environment variables")
+    return token
+
 
 def lvlm_inference_with_phi(prompt):
     client = InferenceClient(
-        token=os.getenv("HUGGINGFACE_TOKEN")  # Make sure to set this environment variable
-    )
-    
-    response = client.text_generation(
-        text=prompt,
-        model="microsoft/phi-2",  # or any other model you prefer
-        max_new_tokens=512,
-        temperature=0.7,
-        do_sample=True,
-        num_return_sequences=1,
-        repetition_penalty=1.1
-    )
-    
-    return response[0]["generated_text"].replace(prompt, "").strip()
-
-def lvlm_inference_with_phi(prompt):
-    client = InferenceClient(
-        token=os.getenv("HUGGINGFACE_TOKEN")  # Make sure to set this environment variable
+        token=get_token()
     )
     
     messages = [{"role": "user", "content": prompt}]
