@@ -128,7 +128,7 @@ def get_metadata_of_yt_video_with_captions(vid_url, from_gen=False):
 
 def return_top_k_most_similar_docs(vid_table_name, query, use_llm=False):
     if not video_processed:
-        gr.Error("Please process the video first in Step 1")
+        raise gr.Error("Please process the video first in Step 1")
     # Initialize results variable outside the if condition
     max_docs = 2
     print("Querying ", vid_table_name)
@@ -178,11 +178,12 @@ def return_top_k_most_similar_docs(vid_table_name, query, use_llm=False):
 
 
 def process_url_and_init(youtube_url, from_gen=False):
+    global video_processed
     video_processed = True
     url_input = gr.update(visible=False)
     submit_btn = gr.update(visible=True)
-    chatbox = gr.update(visible=True)
-    submit_btn2 = gr.update(visible=True)
+    chatbox = gr.update(visible=False)
+    submit_btn_whisper = gr.update(visible=False)
     frame1 = gr.update(visible=True)
     frame2 = gr.update(visible=False)
     chatbox_llm, submit_btn_chat = gr.update(
@@ -190,7 +191,7 @@ def process_url_and_init(youtube_url, from_gen=False):
     vid_filepath, vid_table_name = get_metadata_of_yt_video_with_captions(
         youtube_url, from_gen)
     video = gr.Video(vid_filepath, render=True)
-    return url_input, submit_btn, video, vid_table_name, chatbox, submit_btn2, frame1, frame2, chatbox_llm, submit_btn_chat
+    return url_input, submit_btn, video, vid_table_name, chatbox, submit_btn_whisper, frame1, frame2, chatbox_llm, submit_btn_chat
 
 
 def test_btn():
@@ -200,65 +201,8 @@ def test_btn():
     return response
 
 
-def init_ui():
-    with gr.Blocks() as demo:
-
-        gr.Markdown("Welcome to video chat demo - Initial processing can take up to 2 minutes, and responses may be slow. Please be patient and avoid clicking repeatedly.")
-        url_input = gr.Textbox(label="Enter YouTube URL", visible=False, elem_id='url-inp',
-                               value="https://www.youtube.com/watch?v=kOEDG3j1bjs", interactive=True)
-        vid_table_name = gr.Textbox(
-            label="Enter Table Name", visible=False, interactive=False)
-        video = gr.Video()
-        with gr.Row():
-            submit_btn = gr.Button("Process Video By Download Subtitles")
-            submit_btn_gen = gr.Button("Process Video By Generating Subtitles")
-
-        with gr.Row():
-            chatbox = gr.Textbox(label="Enter the keyword/s and AI will get related captions and images",
-                                 visible=False, value="event horizan", scale=4)
-            submit_btn_whisper = gr.Button(
-                "Submit", elem_id='chat-submit', visible=False, scale=1)
-        with gr.Row():
-            chatbox_llm = gr.Textbox(
-                label="Ask a Question", visible=False, value="what this video is about?", scale=4)
-            submit_btn_chat = gr.Button("Ask", visible=False, scale=1)
-
-        response = gr.Textbox(
-            label="Response", elem_id='chat-response',  visible=False, interactive=False)
-
-        with gr.Row():
-            frame1 = gr.Image(visible=False, interactive=False, scale=2)
-            frame2 = gr.Image(visible=False, interactive=False, scale=2)
-        submit_btn.click(fn=process_url_and_init, inputs=[url_input], outputs=[
-                         url_input, submit_btn, video, vid_table_name, chatbox, submit_btn_whisper, frame1, frame2, chatbox_llm, submit_btn_chat])
-        submit_btn_gen.click(fn=lambda x: process_url_and_init(x, from_gen=True), inputs=[url_input], outputs=[
-                             url_input, submit_btn, video, vid_table_name, chatbox, submit_btn_whisper, frame1, frame2, chatbox_llm, submit_btn_chat])
-        submit_btn_whisper.click(fn=return_top_k_most_similar_docs, inputs=[
-                                 vid_table_name, chatbox], outputs=[response, frame1, frame2])
-
-        submit_btn_chat.click(
-            fn=lambda table_name, query: return_top_k_most_similar_docs(
-                vid_table_name=table_name,
-                query=query,
-                use_llm=True
-            ),
-            inputs=[vid_table_name, chatbox_llm],
-            outputs=[response, frame1, frame2]
-        )
-        reset_btn = gr.Button("Reload Page")
-        reset_btn.click(None, js="() => { location.reload(); }")
-
-        test_llama = gr.Button("Test Llama")
-        test_llama.click(test_btn, None, outputs=[response])
-    return demo
-
-
 def init_improved_ui():
-
-    with gr.Blocks(theme=gr.themes.Soft()) as demo:
-        # Header Section with Introduction
-        with gr.Accordion(label=" # 🎬 Video Analysis Assistant", open=True):
-            gr.Markdown("""
+    full_intro = """
             ## How it Works:
             1. 📥 Provide a YouTube URL.
             2. 🔄 Choose a processing method:
@@ -273,7 +217,25 @@ def init_improved_ui():
             4. 📊 Results will be displayed in the response section with related images.
             
             > **Note**: Initial processing takes several minutes. Please be patient and monitor the logs for progress updates.
-            """)
+            """
+    intro = """
+            ## How it Works:
+            Step 1. 📥 A video URL.
+            Step 2. 🔄 Process Video:
+                Download the video and its captions/subtitles from YouTube OR generate captions using Whisper AI.
+                The system will load the video in video player for preview and process the video and extract frames from it. 
+                It will then pass the captions and images to the RAG model to store them in the database.
+                The RAG (Lance DB) uses a pre-trained BridgeTower model to generate embeddings that provide pairs of captions and related images.
+            Step 3. 🤖 Analyze video content through:
+               - AI-powered Q&A - Use this functionality to ask questions about the video content. Our system will use the Meta/LLaMA model to analyze the captions and images and provide detailed answers.
+            Step 4. 📊 Results will be displayed in the response section with related images.
+            
+            > **Note**: Initial processing takes several minutes. Please be patient and monitor the logs for progress updates.
+            """
+    with gr.Blocks(theme=gr.themes.Ocean()) as demo:
+        # Header Section with Introduction
+        with gr.Accordion(label=" # 🎬 Video Analysis Assistant ", open=False):
+            gr.Markdown(intro)
 
         # Video Input Section
         with gr.Group():
@@ -288,13 +250,12 @@ def init_improved_ui():
 
             with gr.Row():
                 submit_btn = gr.Button(
-                    "📥 Step 1: Process with Existing Subtitles", variant="primary", size='md')
+                    "📥 Step 1: Process with Existing Subtitles", variant="primary")
                 submit_btn_gen = gr.Button(
                     "🎯 Generate New Subtitles", variant="secondary", visible=False)
 
         # Analysis Tools Section
         with gr.Group():
-            gr.Markdown("### 🔍 Step 2: Chat AI about the video")
 
             with gr.Row():
                 chatbox = gr.Textbox(
@@ -310,19 +271,19 @@ def init_improved_ui():
 
             with gr.Row():
                 chatbox_llm = gr.Textbox(
-                    label="",
+                    label="🔍 Chat AI about the video",
                     value="What is this video about?",
                     visible=True
                 )
+            with gr.Row():
                 submit_btn_chat = gr.Button(
-                    "🤖 Ask",
+                    "🤖 Step 2: Ask",
                     visible=True,
-                    scale=1
+                    scale=1, variant="primary"
                 )
 
         # Results Display Section
         with gr.Group():
-            gr.Markdown("### 📊 AI Response")
             response = gr.Textbox(
                 label="AI Response",
                 visible=True,
@@ -337,7 +298,7 @@ def init_improved_ui():
 
         # Control Buttons
         with gr.Row():
-            reset_btn = gr.Button("🔄 Start Over", variant="secondary")
+            reset_btn = gr.Button("🔄 Step 3: Start Over", variant="primary")
             test_llama = gr.Button("🧪 Say Hi to Llama",
                                    visible=False, variant="secondary")
 
