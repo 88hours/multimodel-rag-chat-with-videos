@@ -10,3 +10,7 @@ __pycache__
 shared_data/.lancedb/
 shared_data/.lancedb/**/*
 shared_data/videos/yt_video/blackholes101nationalgeographic/audio.mp3
+mm_rag/embeddings/__pycache__/
+mm_rag/embeddings/__pycache__/**
+.DS_Store
+.devcontainer/
